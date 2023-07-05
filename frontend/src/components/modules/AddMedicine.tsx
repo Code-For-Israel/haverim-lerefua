@@ -20,8 +20,8 @@ const AddMedicine = ({ medicine, onSave }: Props) => {
       direction={'column'}
       component={'form'}
       gap={3}
-      py={3}
-      px={4}
+      py={3.5}
+      px={5}
       justifyContent={'space-between'}
       sx={{ height: '100%', width: '100%' }}
       onSubmit={handleSubmit(onSubmit)}

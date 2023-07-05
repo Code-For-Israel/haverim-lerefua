@@ -5,15 +5,17 @@ import useFormWizard from '@/hooks/useFormWizard'
 import { Box, Button, Drawer, Stack, Typography } from '@mui/material'
 import { MedicineItemType } from 'MedicineTypes'
 import { easeInOut, motion } from 'framer-motion'
+import { useTranslation } from 'next-i18next'
 import { useState } from 'react'
 
 const Names = () => {
   const [searchValue, setSearchValue] = useState('')
   const { stepTo, formData, updateFormData } = useFormWizard()
   const { medicineQuantity } = formData
+  const { t } = useTranslation()
 
   const [selectedMedicine, setSelectedMedicine] = useState<MedicineItemType | null>(null)
-  const [allMedicines, setAllMedicines] = useState<MedicineItemType[]>([])
+  const [allMedicines, setAllMedicines] = useState<MedicineItemType[]>(formData?.medicines || [])
 
   const handleClose = () => {
     setSelectedMedicine(null)
@@ -32,6 +34,10 @@ const Names = () => {
     setAllMedicines([...allMedicines, medWithState])
     updateFormData({ medicines: [...allMedicines, medWithState] })
     setSelectedMedicine(null)
+  }
+
+  const handleDone = () => {
+    stepTo('names-summary')
   }
 
   const handleSkip = () => {
@@ -56,9 +62,9 @@ const Names = () => {
           display: hideText ? 'none' : 'flex',
         }}
       >
-        <Typography variant="h1">אילו תרופות היית רוצה לתרום?</Typography>
+        <Typography variant="h1">{t('names_page_title')}</Typography>
         <Typography variant="body1" textAlign={'center'}>
-          כדי שנוכל להיערך לקליטת התרופות, נצטרך לדעת איזה תרופות יש לך
+          {t('names_page_subtitle')}
         </Typography>
       </Stack>
       <motion.div
@@ -69,7 +75,7 @@ const Names = () => {
         layout
         transition={{ ease: easeInOut, type: 'spring', duration: 0.5 }}
       >
-        <Autocomplete value={searchValue} onValueChange={handleSearch} placeholder="שם התרופה בעברית או באנגלית" />
+        <Autocomplete value={searchValue} onValueChange={handleSearch} placeholder={t('names_search_placeholder')} />
         <Box pt={2}>
           {hideText &&
             [1, 2, 3, 4, 5].map(m => (
@@ -85,11 +91,11 @@ const Names = () => {
       >
         {selectedMedicine && <AddMedicine onSave={handleSave} medicine={selectedMedicine} />}
       </Drawer>
-      <Button variant="contained" sx={{ display: allMedicines.length > 0 ? 'block' : 'none' }} onClick={handleSkip}>
-        סיימתי ({allMedicines.length})
+      <Button variant="contained" sx={{ display: allMedicines.length > 0 ? 'block' : 'none' }} onClick={handleDone}>
+        {t('im_done')} ({allMedicines.length})
       </Button>
       <Button variant="text" sx={{ display: hideText || allMedicines.length > 0 ? 'none' : 'block' }} onClick={handleSkip}>
-        לא הפעם
+        {t('want_to_skip')}
       </Button>
     </Stack>
   )

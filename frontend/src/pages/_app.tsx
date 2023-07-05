@@ -6,11 +6,12 @@ import { CacheProvider } from '@emotion/react'
 import { ThemeProvider } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { appWithTranslation } from 'next-i18next'
 import type { AppProps } from 'next/app'
 import { prefixer } from 'stylis'
 import rtlPlugin from 'stylis-plugin-rtl'
 
-export default function App({ Component, pageProps }: AppProps) {
+const App = ({ Component, pageProps }: AppProps) => {
   const cacheRtl = createCache({
     key: 'muirtl',
     stylisPlugins: [prefixer, rtlPlugin],
@@ -27,3 +28,5 @@ export default function App({ Component, pageProps }: AppProps) {
     </ThemeProvider>
   )
 }
+
+export default appWithTranslation(App)

@@ -1,6 +1,7 @@
 import useFormWizard from '@/hooks/useFormWizard'
 import { Box, Button, FormControlLabel, Radio, RadioGroup, Stack, Typography } from '@mui/material'
 import { FormValuesType } from 'FormTypes'
+import { useTranslation } from 'next-i18next'
 import { Controller, useForm } from 'react-hook-form'
 
 const Quantity = () => {
@@ -10,6 +11,7 @@ const Quantity = () => {
     handleSubmit,
     formState: { isValid },
   } = useForm()
+  const { t } = useTranslation()
 
   const onSubmit = (data: FormValuesType) => {
     if (!isValid) return
@@ -32,7 +34,7 @@ const Quantity = () => {
       component={'form'}
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Typography variant="h1">כמה תרופות יש לך?</Typography>
+      <Typography variant="h1">{t('quantity_page_title')}</Typography>
       <Box
         sx={{
           flex: 1,
@@ -49,9 +51,9 @@ const Quantity = () => {
           rules={{ required: true }}
           render={({ field: { onChange, value } }) => (
             <RadioGroup aria-label="quantity" value={value} onChange={onChange}>
-              <FormControlLabel value="1-10" control={<Radio />} label="עד 10 פריטים" />
-              <FormControlLabel value="11-40" control={<Radio />} label="עד 40 פריטים" />
-              <FormControlLabel value="40+" control={<Radio />} label="מעל 40 פריטים" />
+              <FormControlLabel value="1-10" control={<Radio />} label={t('max_10_items')} />
+              <FormControlLabel value="11-40" control={<Radio />} label={t('max_40_items')} />
+              <FormControlLabel value="40+" control={<Radio />} label={t('40_plus_items')} />
             </RadioGroup>
           )}
         />
