@@ -1,13 +1,13 @@
-declare module "FormTypes" {
-  import { ComponentType } from "react";
+declare module 'FormTypes' {
+  import { ComponentType } from 'react'
   export interface FormStepType {
-    title: string;
-    path: string;
-    showProgress: boolean;
-    component: ComponentType<any>;
-    finalStep: boolean;
+    path: string
+    showProgress: boolean
+    progress: number
+    component: ComponentType<any>
+    finalStep: boolean
   }
   export interface FormValuesType {
-    [key: string]: any;
+    [key: string]: any
   }
 }

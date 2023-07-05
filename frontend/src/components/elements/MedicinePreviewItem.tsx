@@ -3,18 +3,21 @@ import { MedicineItemType } from 'MedicineTypes'
 import Image from 'next/image'
 import PlaceholderIcon from 'public/icons/placeholder.svg'
 
-type Props = { medicine: MedicineItemType; onClick: (medicine: MedicineItemType) => void }
+type Props = { medicine: MedicineItemType; onClick?: (medicine: MedicineItemType) => void }
 
 const MedicinePreviewItem = ({ medicine, onClick }: Props) => {
   const { name, englishName, image } = medicine
+
   const handleClick = () => {
-    onClick(medicine)
+    if (onClick) onClick(medicine)
   }
+
   return (
     <Stack
       direction={'row'}
       component={ButtonBase}
       onClick={handleClick}
+      disableRipple={!onClick}
       gap={2}
       sx={{
         alignItems: 'center',
@@ -23,6 +26,9 @@ const MedicinePreviewItem = ({ medicine, onClick }: Props) => {
         py: 5,
         borderBottom: '1px solid #B3B3B3',
         width: '100%',
+        '&:last-of-type': {
+          borderBottom: 'none',
+        },
       }}
     >
       <Box

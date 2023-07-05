@@ -3,6 +3,7 @@ import Details from '@/components/steps/Details'
 import Home from '@/components/steps/Home'
 import Map from '@/components/steps/Map'
 import Names from '@/components/steps/Names'
+import NamesSummary from '@/components/steps/NamesSummary'
 import Quantity from '@/components/steps/Quantity'
 import ThankYou from '@/components/steps/ThankYou'
 
@@ -10,51 +11,58 @@ import { FormStepType } from 'FormTypes'
 
 const steps: FormStepType[] = [
   {
-    title: 'תרומת תרופות',
     path: 'start',
     showProgress: false,
+    progress: 0,
     finalStep: false,
     component: Home,
   },
   {
-    title: 'כמות תרופות',
     path: 'quantity',
     showProgress: true,
+    progress: 10,
     finalStep: false,
     component: Quantity,
   },
   {
-    title: 'שמות תרופות',
     path: 'names',
     showProgress: true,
+    progress: 20,
     finalStep: false,
     component: Names,
   },
   {
-    title: 'אחסון בקירור',
+    path: 'names-summary',
+    showProgress: true,
+    progress: 30,
+    finalStep: false,
+    component: NamesSummary,
+  },
+  {
     path: 'cold-storage',
     showProgress: true,
+    progress: 60,
     finalStep: false,
     component: Cold,
   },
   {
-    title: 'פרטי התורמ/ת',
     path: 'details',
     showProgress: false,
+    progress: 90,
     finalStep: true,
     component: Details,
   },
   {
-    title: 'אפשרויות מסירה',
     path: 'map',
     showProgress: false,
+    progress: 100,
     finalStep: true,
     component: Map,
   },
   {
-    title: '',
     path: 'thank-you',
     showProgress: false,
+    progress: 100,
     finalStep: true,
     component: ThankYou,
   },
