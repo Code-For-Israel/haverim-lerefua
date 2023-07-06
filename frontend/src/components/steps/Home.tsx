@@ -11,7 +11,7 @@ const Home = () => {
   const { t } = useTranslation()
 
   return (
-    <Stack gap={2} pb={2} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
+    <Stack gap={2} pb={3} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
       <Stack gap={1} alignItems={'center'}>
         <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
           <Image src={BoxHeart} alt="box" />

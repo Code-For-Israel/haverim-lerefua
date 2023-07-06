@@ -51,7 +51,7 @@ const Names = () => {
   const hideText = searchValue.trim().length > 0
 
   return (
-    <Stack gap={2} pb={2} alignItems={'center'} width={'100%'} position={'relative'} justifyContent={'space-between'}>
+    <Stack gap={2} pb={3} alignItems={'center'} width={'100%'} position={'relative'} justifyContent={'space-between'}>
       <Stack
         gap={2}
         mb={4}

@@ -34,7 +34,7 @@ const NamesSummary = () => {
   }
 
   return (
-    <Stack gap={2} pb={2} alignItems={'center'} width={'100%'} position={'relative'} justifyContent={'space-between'}>
+    <Stack gap={2} pb={3} alignItems={'center'} width={'100%'} position={'relative'} justifyContent={'space-between'}>
       <Typography variant="h1">{t('names_summary_page_title')}</Typography>
       <Box sx={{ display: 'flex', flex: 1, width: '100%', height: '100%', mt: 3 }}>
         <Stack sx={{ width: '100%', borderRadius: '12px', height: 'fit-content', px: 3, py: 1, boxShadow: '0.5px 1px 4px 2px rgba(0, 0, 0, 0.08)' }}>
@@ -43,8 +43,11 @@ const NamesSummary = () => {
           ))}
         </Stack>
       </Box>
-      <FormControlLabel control={<Checkbox checked={hasMoreProducts} onChange={toggleMoreProducts} />} label={t('i_have_more_products_to_donate')} />
-      <Button variant="contained" onClick={handleFinish}>
+      <FormControlLabel
+        control={<Checkbox size="small" checked={hasMoreProducts} onChange={toggleMoreProducts} />}
+        label={t('i_have_more_products_to_donate')}
+      />
+      <Button variant="contained" sx={{ mt: 2 }} onClick={handleFinish}>
         {t('continue')}
       </Button>
       <Button variant="text" onClick={handleBack}>

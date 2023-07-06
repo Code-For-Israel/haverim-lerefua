@@ -18,15 +18,8 @@ const MedicinePreviewItem = ({ medicine, onClick, onRemove }: Props) => {
   }
 
   return (
-    <Stack
-      direction={'row'}
-      component={ButtonBase}
-      onClick={handleClick}
-      disableRipple={!onClick}
-      gap={2}
+    <Box
       sx={{
-        alignItems: 'center',
-        justifyContent: 'flex-start',
         height: 65,
         py: 5,
         borderBottom: '1px solid #B3B3B3',
@@ -34,41 +27,51 @@ const MedicinePreviewItem = ({ medicine, onClick, onRemove }: Props) => {
         '&:last-of-type': {
           borderBottom: 'none',
         },
+        position: 'relative',
       }}
     >
-      <Box
-        sx={{
-          borderRadius: 2,
-          width: 48,
-          height: 48,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          bgcolor: '#EEEEEE',
-        }}
+      <Stack
+        component={ButtonBase}
+        direction={'row'}
+        gap={2}
+        sx={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'flex-start', position: 'absolute', right: 0, top: 0 }}
+        onClick={handleClick}
       >
-        <Image src={image || PlaceholderIcon} alt="medicine" />
-      </Box>
-      <Box sx={{ textAlign: 'start' }}>
-        <Typography variant="body2">{name}</Typography>
-        <Typography variant="body2">{englishName}</Typography>
-      </Box>
+        <Box
+          sx={{
+            borderRadius: 2,
+            width: 48,
+            height: 48,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            bgcolor: '#EEEEEE',
+          }}
+        >
+          <Image src={image || PlaceholderIcon} alt="medicine" />
+        </Box>
+        <Box sx={{ textAlign: 'start' }}>
+          <Typography variant="body2">{name}</Typography>
+          <Typography variant="body2">{englishName}</Typography>
+        </Box>
+      </Stack>
+
       <Box
         sx={{
           display: !!onRemove ? 'block' : 'none',
           position: 'absolute',
-          right: 2,
-          top: '45%',
+          right: 6,
+          top: '50%',
           height: 13,
           width: 13,
-          transform: 'translateY(-50%)',
+          transform: 'translateY(-15px)',
         }}
       >
         <IconButton onClick={handleRemove} sx={{ p: 0 }}>
           <Image src={CloseIcon} alt="remove" />
         </IconButton>
       </Box>
-    </Stack>
+    </Box>
   )
 }
 

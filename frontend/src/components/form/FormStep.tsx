@@ -17,7 +17,7 @@ const FormStep = () => {
           justifyContent: 'space-between',
           alignItems: 'center',
           py: 2,
-          px: 4,
+          px: 2,
         }}
       >
         {showProgress && <FormProgress progress={activeStep} totalSteps={totalSteps} />}

@@ -53,7 +53,7 @@ const Quantity = () => {
           defaultValue={''}
           rules={{ required: true }}
           render={({ field: { onChange, value } }) => (
-            <RadioGroup aria-label="quantity" value={value} onChange={onChange} sx={{ gap: 2 }}>
+            <RadioGroup aria-label="quantity" value={value} onChange={onChange} sx={{ rowGap: 1 }}>
               <FormRadio value="1-10" label={t('max_10_items')} selected={quantity} />
               <FormRadio value="11-40" label={t('max_40_items')} selected={quantity} />
               <FormRadio value="40+" label={t('40_plus_items')} selected={quantity} />

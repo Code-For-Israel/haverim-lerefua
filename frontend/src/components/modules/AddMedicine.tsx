@@ -25,8 +25,8 @@ const AddMedicine = ({ medicine, onSave }: Props) => {
     <Stack
       direction={'column'}
       component={'form'}
-      gap={3}
-      py={3.5}
+      gap={2}
+      py={3}
       px={5}
       justifyContent={'space-between'}
       sx={{ height: '100%', width: '100%' }}
@@ -43,7 +43,7 @@ const AddMedicine = ({ medicine, onSave }: Props) => {
         defaultValue={''}
         rules={{ required: true }}
         render={({ field: { onChange, value } }) => (
-          <RadioGroup sx={{ rowGap: 1, width: 'fit-content' }} aria-label="expired-state" value={value} onChange={onChange}>
+          <RadioGroup sx={{ width: 'fit-content' }} aria-label="expired-state" value={value} onChange={onChange}>
             <FormRadio value="inAMonth" label="כן" selected={expiredState} />
             <FormRadio value="noOrUnknown" label="לא / לא ידוע" selected={expiredState} />
             <FormRadio value="expired" label="פג תוקף" selected={expiredState} />

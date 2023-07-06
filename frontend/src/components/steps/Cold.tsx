@@ -19,7 +19,7 @@ const Cold = () => {
 
   if (medicineQuantity && medicineQuantity === '1-10')
     return (
-      <Stack gap={2} pb={2} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
+      <Stack gap={2} pb={3} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
         <Box width={'100%'} textAlign={'center'}>
           <Typography variant="h1">{t('cold_page_title_few')}</Typography>
         </Box>
@@ -39,7 +39,7 @@ const Cold = () => {
   }
 
   return (
-    <Stack gap={2} pb={2} alignItems={'center'} width={'100%'} justifyContent={'space-between'} component="form" onSubmit={handleSubmit(onSubmit)}>
+    <Stack gap={2} pb={3} alignItems={'center'} width={'100%'} justifyContent={'space-between'} component="form" onSubmit={handleSubmit(onSubmit)}>
       <Box width={'100%'} textAlign={'center'}>
         <Typography variant="h1">{t('cold_page_title_many')}</Typography>
       </Box>
