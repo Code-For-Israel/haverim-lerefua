@@ -1,10 +1,29 @@
 import FormProgress from '@/components/form/FormProgress'
 import useFormWizard from '@/hooks/useFormWizard'
 import { Box } from '@mui/material'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 
 const FormStep = () => {
-  const { activeStep, getStepDetails, totalSteps } = useFormWizard()
-  const { showProgress, component: Component } = getStepDetails(activeStep)
+  const { activeStep, getStepDetails, totalSteps, stepBack } = useFormWizard()
+  const { showProgress, component: Component, path } = getStepDetails(activeStep)
+  const router = useRouter()
+
+  useEffect(() => {
+    if (activeStep >= 0 && router.query?.step !== path) router.replace({ query: { step: path } }, undefined, { shallow: true })
+    router.beforePopState(({ as }) => {
+      const currentPath = router.asPath
+      if (as !== currentPath) {
+        window.history.pushState(null, '', as)
+        stepBack()
+      }
+      return true
+    })
+
+    return () => {
+      router.beforePopState(() => true)
+    }
+  }, [router, stepBack])
 
   return (
     <>
@@ -16,8 +35,9 @@ const FormStep = () => {
           flexDirection: 'column',
           justifyContent: 'space-between',
           alignItems: 'center',
-          py: 2,
+          pt: 2,
           px: 2,
+          pb: 4,
         }}
       >
         {showProgress && <FormProgress progress={activeStep} totalSteps={totalSteps} />}

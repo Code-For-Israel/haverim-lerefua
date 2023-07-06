@@ -4,8 +4,6 @@ import { i18n } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Assistant } from 'next/font/google'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 
 export async function getStaticProps({ locale }: any) {
   if (process.env.NODE_ENV === 'development') {
@@ -21,21 +19,6 @@ export async function getStaticProps({ locale }: any) {
 const assistant = Assistant({ subsets: ['latin'] })
 
 export default function Home() {
-  const router = useRouter()
-
-  useEffect(() => {
-    router.beforePopState(({ url, as, options }) => {
-      console.log(url, as, options)
-
-      if (as !== '/' && as !== '/other') {
-        // window.location.href = as
-        console.log('TAKE ME HOME')
-        return false
-      }
-
-      return false
-    })
-  }, [router])
   return (
     <>
       <Head>
