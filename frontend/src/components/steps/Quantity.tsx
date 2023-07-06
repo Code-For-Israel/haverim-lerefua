@@ -29,7 +29,7 @@ const Quantity = () => {
   return (
     <Stack
       gap={2}
-      pb={2}
+      pb={3}
       alignItems={'center'}
       width={'100%'}
       position={'relative'}

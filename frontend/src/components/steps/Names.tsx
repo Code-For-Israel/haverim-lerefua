@@ -10,7 +10,7 @@ import { useState } from 'react'
 
 const Names = () => {
   const [searchValue, setSearchValue] = useState('')
-  const { stepTo, formData, updateFormData } = useFormWizard()
+  const { stepTo, formData, updateFormData, submitData } = useFormWizard()
   const { medicineQuantity } = formData
   const { t } = useTranslation()
 
@@ -36,16 +36,27 @@ const Names = () => {
     setSelectedMedicine(null)
   }
 
+  const handleRemove = (medicine: MedicineItemType) => {
+    const newMedicines = allMedicines.filter((m: MedicineItemType) => m.id !== medicine.id)
+    setAllMedicines(newMedicines)
+    updateFormData({ ...formData, medicines: newMedicines })
+  }
+
   const handleDone = () => {
     stepTo('names-summary')
   }
 
   const handleSkip = () => {
     if (medicineQuantity && medicineQuantity !== '1-10') {
+      submitData('map')
       stepTo('map')
     } else {
       stepTo('cold-storage')
     }
+  }
+
+  const isMedicineAdded = (id: number) => {
+    return allMedicines.some((m: MedicineItemType) => m.id === id)
   }
 
   const hideText = searchValue.trim().length > 0
@@ -79,7 +90,13 @@ const Names = () => {
         <Box pt={2}>
           {hideText &&
             [1, 2, 3, 4, 5].map((m, i) => (
-              <MedicinePreviewItem onClick={handleSelect} key={i} medicine={{ id: i, name: 'מירו 30', englishName: 'Miro' }} />
+              <MedicinePreviewItem
+                onClick={handleSelect}
+                disabled={isMedicineAdded(i)}
+                key={i}
+                medicine={{ id: i, name: 'מירו 30', englishName: 'Miro' }}
+                onRemove={isMedicineAdded(i) ? handleRemove : undefined}
+              />
             ))}
         </Box>
       </motion.div>
@@ -87,7 +104,7 @@ const Names = () => {
         anchor="bottom"
         open={!!selectedMedicine}
         onClose={handleClose}
-        sx={{ '& .MuiPaper-root': { borderTopLeftRadius: 36, borderTopRightRadius: 36, height: '50%' } }}
+        sx={{ '& .MuiPaper-root': { borderTopLeftRadius: 36, borderTopRightRadius: 36, height: '60%' } }}
       >
         {selectedMedicine && <AddMedicine onSave={handleSave} medicine={selectedMedicine} />}
       </Drawer>

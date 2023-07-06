@@ -6,7 +6,7 @@ import { useTranslation } from 'next-i18next'
 import { FieldValues, UseFormRegister, useForm } from 'react-hook-form'
 
 const Details = () => {
-  const { stepTo, updateFormData } = useFormWizard()
+  const { stepTo, updateFormData, submitData } = useFormWizard()
   const link = generatWALink()
   const { t } = useTranslation()
   const {
@@ -20,6 +20,7 @@ const Details = () => {
 
   const onSubmit = (data: FormValuesType) => {
     updateFormData(data)
+    submitData('whatsapp')
     const waLink = generatWALink(123456789, t('whatsapp_message_with_cold', { fullName, street, houseNumber, town }))
     window.open(waLink, '_blank')
     stepTo('thank-you')

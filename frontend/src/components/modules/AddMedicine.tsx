@@ -25,11 +25,11 @@ const AddMedicine = ({ medicine, onSave }: Props) => {
     <Stack
       direction={'column'}
       component={'form'}
-      gap={2}
+      gap={1}
       py={3}
       px={5}
       justifyContent={'space-between'}
-      sx={{ height: '100%', width: '100%' }}
+      sx={{ height: '100%', width: '100%', overflowY: 'auto' }}
       onSubmit={handleSubmit(onSubmit)}
     >
       <Stack width="100%" sx={{ textAlign: 'center' }}>
@@ -50,7 +50,7 @@ const AddMedicine = ({ medicine, onSave }: Props) => {
           </RadioGroup>
         )}
       />
-      <Button variant="contained" disabled={!isValid} type="submit">
+      <Button variant="contained" sx={{ mb: 3 }} disabled={!isValid} type="submit">
         {t('add_medicine')}
       </Button>
     </Stack>

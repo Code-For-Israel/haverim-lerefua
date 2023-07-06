@@ -10,6 +10,8 @@ type FormContextType = {
   steps: FormStepType[]
   stepHistory: string[]
   setStepHistory: (steps: string[]) => void
+  loading: boolean
+  setLoading: (loading: boolean) => void
 }
 export const FormContext = createContext<FormContextType>({
   activeStep: 0,
@@ -19,13 +21,16 @@ export const FormContext = createContext<FormContextType>({
   steps: [],
   stepHistory: [],
   setStepHistory: () => undefined,
+  loading: false,
+  setLoading: () => undefined,
 })
 
 type Props = { children: ReactNode }
 const FormWizardProvider = ({ children }: Props) => {
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStep, setActiveStep] = useState<number>(0)
   const [formValues, setFormValues] = useState<FormValuesType>({})
   const [stepHistory, setStepHistory] = useState<string[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
 
   return (
     <FormContext.Provider
@@ -37,6 +42,8 @@ const FormWizardProvider = ({ children }: Props) => {
         steps,
         stepHistory,
         setStepHistory,
+        loading,
+        setLoading,
       }}
     >
       {children}

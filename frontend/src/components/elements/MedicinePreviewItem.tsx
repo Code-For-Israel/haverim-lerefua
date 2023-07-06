@@ -1,12 +1,16 @@
-import { Box, ButtonBase, IconButton, Stack, Typography } from '@mui/material'
+import { Box, ButtonBase, ButtonBaseProps, IconButton, Stack, Typography } from '@mui/material'
 import { MedicineItemType } from 'MedicineTypes'
 import Image from 'next/image'
 import CloseIcon from 'public/icons/close.svg'
 import PlaceholderIcon from 'public/icons/placeholder.svg'
 
-type Props = { medicine: MedicineItemType; onClick?: (medicine: MedicineItemType) => void; onRemove?: (medicine: MedicineItemType) => void }
+type Props = {
+  medicine: MedicineItemType
+  onClick?: (medicine: MedicineItemType) => void
+  onRemove?: (medicine: MedicineItemType) => void
+} & Omit<ButtonBaseProps, 'onClick'>
 
-const MedicinePreviewItem = ({ medicine, onClick, onRemove }: Props) => {
+const MedicinePreviewItem = ({ medicine, onClick, onRemove, ...rest }: Props) => {
   const { name, englishName, image } = medicine
 
   const handleClick = () => {
@@ -34,6 +38,7 @@ const MedicinePreviewItem = ({ medicine, onClick, onRemove }: Props) => {
         component={ButtonBase}
         direction={'row'}
         gap={2}
+        {...rest}
         sx={{ width: '100%', height: '100%', alignItems: 'center', justifyContent: 'flex-start', position: 'absolute', right: 0, top: 0 }}
         onClick={handleClick}
       >

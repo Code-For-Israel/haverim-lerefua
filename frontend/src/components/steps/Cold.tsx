@@ -5,16 +5,19 @@ import { useTranslation } from 'next-i18next'
 import { useForm } from 'react-hook-form'
 
 const Cold = () => {
-  const { stepTo, updateFormData, formData } = useFormWizard()
+  const { stepTo, updateFormData, formData, submitData } = useFormWizard()
   const { medicineQuantity } = formData
   const { register, handleSubmit, watch } = useForm()
   const { t } = useTranslation()
 
-  const handleNext = (isCold: boolean) => () => {
-    updateFormData({ isCold: isCold })
+  const handleNext = (hasCold: boolean) => () => {
+    updateFormData({ hasCold: hasCold })
     if (medicineQuantity && medicineQuantity !== '1-10') {
       stepTo('names')
-    } else stepTo('map')
+    } else {
+      submitData('map')
+      stepTo('map')
+    }
   }
 
   if (medicineQuantity && medicineQuantity === '1-10')
@@ -32,7 +35,7 @@ const Cold = () => {
       </Stack>
     )
 
-  const { isCold: watchIsCold, isExpensive: watchIsExpensive } = watch()
+  const { hasCold: watchHasCold, hasExpensive: watchHasExpensive } = watch()
   const onSubmit = (data: FormValuesType) => {
     updateFormData(data)
     stepTo('names')
@@ -44,14 +47,14 @@ const Cold = () => {
         <Typography variant="h1">{t('cold_page_title_many')}</Typography>
       </Box>
       <Stack mt={6} flex={1} width={'100%'}>
-        <FormControlLabel control={<Checkbox {...register('isCold')} />} label={t('i_have_cold_medicine')} />
-        <FormControlLabel control={<Checkbox {...register('isExpensive')} />} label={t('i_have_expensive_medicine')} />
+        <FormControlLabel control={<Checkbox {...register('hasCold')} />} label={t('i_have_cold_medicine')} />
+        <FormControlLabel control={<Checkbox {...register('hasExpensive')} />} label={t('i_have_expensive_medicine')} />
       </Stack>
       <Stack gap={2} width={'100%'}>
-        <Button variant="contained" disabled={!watchIsCold && !watchIsExpensive} type="submit">
+        <Button variant="contained" disabled={!watchHasCold && !watchHasExpensive} type="submit">
           {t('continue')}
         </Button>
-        <Button variant="text" disabled={!!watchIsCold || !!watchIsExpensive} onClick={handleNext(false)}>
+        <Button variant="text" disabled={!!watchHasCold || !!watchHasExpensive} onClick={handleNext(false)}>
           {t('no_dont_have')}
         </Button>
       </Stack>

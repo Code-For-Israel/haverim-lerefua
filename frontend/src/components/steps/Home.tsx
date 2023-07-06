@@ -13,7 +13,7 @@ const Home = () => {
   return (
     <Stack gap={2} pb={3} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
       <Stack gap={1} alignItems={'center'}>
-        <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+        <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
           <Image src={BoxHeart} alt="box" />
         </Box>
         <Typography variant="h1">{t('welcome_title')}</Typography>
@@ -37,9 +37,9 @@ const Home = () => {
           </Stack>
         ))}
       </Stack>
-      <span>
+      <Typography variant="body2">
         *{t('welcome_disclaimer_1')} <Link>{t('welcome_disclaimer_2')}</Link>
-      </span>
+      </Typography>
       <Button sx={{ mt: 1 }} onClick={startForm}>
         {t('welcome_start_cta')}
       </Button>

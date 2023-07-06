@@ -7,15 +7,16 @@ import { ChangeEvent, useState } from 'react'
 
 const NamesSummary = () => {
   const [hasMoreProducts, setHasMoreProducts] = useState(false)
-  const { stepTo, formData, updateFormData } = useFormWizard()
+  const { stepTo, formData, updateFormData, submitData } = useFormWizard()
   const { t } = useTranslation()
 
   const selectedMedicines = formData?.medicines
 
   const handleFinish = () => {
-    if (!!formData?.isExpensive || hasMoreProducts) {
+    if (!!formData?.hasExpensive || hasMoreProducts) {
       stepTo('details')
     } else {
+      submitData('map')
       stepTo('map')
     }
   }
@@ -39,7 +40,7 @@ const NamesSummary = () => {
       <Box sx={{ display: 'flex', flex: 1, width: '100%', height: '100%', mt: 3 }}>
         <Stack sx={{ width: '100%', borderRadius: '12px', height: 'fit-content', px: 3, py: 1, boxShadow: '0.5px 1px 4px 2px rgba(0, 0, 0, 0.08)' }}>
           {selectedMedicines?.map((m: MedicineItemType, i: number) => (
-            <MedicinePreviewItem medicine={m} key={i} onRemove={handleRemove} />
+            <MedicinePreviewItem medicine={m} key={i} onRemove={handleRemove} disabled />
           ))}
         </Stack>
       </Box>
