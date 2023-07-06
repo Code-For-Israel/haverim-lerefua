@@ -1,5 +1,5 @@
 import FormStep from '@/components/form/FormStep'
-import { Box } from '@mui/material'
+import { Box, Container } from '@mui/material'
 import { i18n } from 'next-i18next'
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { Assistant } from 'next/font/google'
@@ -44,17 +44,19 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Box
-        component={'main'}
-        className={assistant.className}
-        sx={{
-          height: '100svh',
-          width: '100%',
-          position: 'relative',
-        }}
-      >
-        <FormStep />
-      </Box>
+      <Container maxWidth="sm" sx={{ boxShadow: 2 }}>
+        <Box
+          component={'main'}
+          className={assistant.className}
+          sx={{
+            height: '100svh',
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          <FormStep />
+        </Box>
+      </Container>
     </>
   )
 }

@@ -79,6 +79,7 @@ export const theme = createTheme({
     MuiRadio: {
       defaultProps: {
         disableRipple: true,
+        size: 'small',
         checkedIcon: (
           <SvgIcon>
             <svg width="20" height="20" viewBox="0 0 23 23" fill="none">
@@ -91,16 +92,6 @@ export const theme = createTheme({
         root: {
           marginRight: 10,
           color: '#979797',
-          '&.Mui-checked': {
-            color: primaryColor,
-          },
-        },
-      },
-    },
-    FormControlLabel: {
-      styleOverrides: {
-        label: {
-          fontWeight: 200,
         },
       },
     },

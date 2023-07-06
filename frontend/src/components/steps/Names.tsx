@@ -73,13 +73,13 @@ const Names = () => {
           flex: 1,
         }}
         layout
-        transition={{ ease: easeInOut, type: 'spring', duration: 0.5 }}
+        transition={{ ease: easeInOut, type: 'spring', duration: 0.35 }}
       >
         <Autocomplete value={searchValue} onValueChange={handleSearch} placeholder={t('names_search_placeholder')} />
         <Box pt={2}>
           {hideText &&
-            [1, 2, 3, 4, 5].map(m => (
-              <MedicinePreviewItem onClick={handleSelect} key={m} medicine={{ id: 1, name: 'מירו 30', englishName: 'Miro' }} />
+            [1, 2, 3, 4, 5].map((m, i) => (
+              <MedicinePreviewItem onClick={handleSelect} key={i} medicine={{ id: i, name: 'מירו 30', englishName: 'Miro' }} />
             ))}
         </Box>
       </motion.div>
@@ -91,7 +91,7 @@ const Names = () => {
       >
         {selectedMedicine && <AddMedicine onSave={handleSave} medicine={selectedMedicine} />}
       </Drawer>
-      <Button variant="contained" sx={{ display: allMedicines.length > 0 ? 'block' : 'none' }} onClick={handleDone}>
+      <Button variant="contained" disabled={allMedicines.length < 1} sx={{ opacity: allMedicines.length > 0 ? 1 : 0 }} onClick={handleDone}>
         {t('im_done')} ({allMedicines.length})
       </Button>
       <Button variant="text" sx={{ display: hideText || allMedicines.length > 0 ? 'none' : 'block' }} onClick={handleSkip}>

@@ -1,31 +1,31 @@
-import { FormStepType, FormValuesType } from "FormTypes";
-import { ReactNode, createContext, useState } from "react";
-import steps from "@/util/steps";
+import steps from '@/util/steps'
+import { FormStepType, FormValuesType } from 'FormTypes'
+import { ReactNode, createContext, useState } from 'react'
 
 type FormContextType = {
-  activeStep: number;
-  setActiveStep: (step: number) => void;
-  formValues: FormValuesType;
-  setFormValues: (values: FormValuesType) => void;
-  steps: FormStepType[];
-  stepHistory: string[];
-  setStepHistory: (steps: string[]) => void;
-};
+  activeStep: number
+  setActiveStep: (step: number) => void
+  formValues: FormValuesType
+  setFormValues: (values: FormValuesType) => void
+  steps: FormStepType[]
+  stepHistory: string[]
+  setStepHistory: (steps: string[]) => void
+}
 export const FormContext = createContext<FormContextType>({
   activeStep: 0,
-  setActiveStep: () => {},
+  setActiveStep: () => undefined,
   formValues: {},
-  setFormValues: () => {},
+  setFormValues: () => undefined,
   steps: [],
   stepHistory: [],
-  setStepHistory: () => {},
-});
+  setStepHistory: () => undefined,
+})
 
-type Props = { children: ReactNode };
+type Props = { children: ReactNode }
 const FormWizardProvider = ({ children }: Props) => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [formValues, setFormValues] = useState<FormValuesType>({});
-  const [stepHistory, setStepHistory] = useState<string[]>([]);
+  const [activeStep, setActiveStep] = useState(0)
+  const [formValues, setFormValues] = useState<FormValuesType>({})
+  const [stepHistory, setStepHistory] = useState<string[]>([])
 
   return (
     <FormContext.Provider
@@ -41,7 +41,7 @@ const FormWizardProvider = ({ children }: Props) => {
     >
       {children}
     </FormContext.Provider>
-  );
-};
+  )
+}
 
-export default FormWizardProvider;
+export default FormWizardProvider

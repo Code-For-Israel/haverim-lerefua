@@ -1,10 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Assistant&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Assistant&display=swap');
 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
-  font-family: "Assistant", sans-serif;
+  font-family: 'Assistant', sans-serif;
 }
 
 html,
@@ -33,7 +33,7 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type="number"] {
+input[type='number'] {
   appearance: textfield;
   -moz-appearance: textfield;
 }
