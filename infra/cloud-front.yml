@@ -1,0 +1,58 @@
+Resources:
+  CloudFrontCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties: 
+      CachePolicyConfig:
+        Name: ApiGatewayCachePolicy
+        DefaultTTL: 2592000 # 30 days
+        MaxTTL: 2592000
+        MinTTL: 2592000
+        ParametersInCacheKeyAndForwardedToOrigin:
+            CookiesConfig:
+              CookieBehavior: none
+            EnableAcceptEncodingBrotli: false
+            EnableAcceptEncodingGzip: false
+            HeadersConfig:
+              HeaderBehavior: none
+            QueryStringsConfig:
+              QueryStringBehavior: all
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: Caching for API Gateway
+        Enabled: true
+        PriceClass: PriceClass_100
+        Restrictions:
+          GeoRestriction:
+            RestrictionType: whitelist
+            Locations:
+            - IL
+        Origins:
+        - DomainName: !Join [ '', !Split [ 'https://', !GetAtt HttpApi.ApiEndpoint ] ]
+          Id: apiGatewayOrigin
+          CustomOriginConfig:
+            OriginProtocolPolicy: https-only
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+        DefaultCacheBehavior:
+            AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+            CachePolicyId: !Ref CloudFrontCachePolicy
+            Compress: true
+            TargetOriginId: apiGatewayOrigin
+            ViewerProtocolPolicy: redirect-to-https
+        # You can add logging for debug purposes, currently in a comment due to the cost:
+        #Logging:
+          #IncludeCookies: false
+          #Bucket: <your bucket name>.s3.amazonaws.com
+          #Prefix: cloudfront
+Outputs:
+  CloudFrontUrl:
+    Value: !GetAtt CloudFrontDistribution.DomainName
