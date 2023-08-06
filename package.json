@@ -5,7 +5,9 @@
   "author": "Code4Israel",
   "license": "MIT",
   "jest": {
-    "testPathIgnorePatterns": ["./frontend"]
+    "testPathIgnorePatterns": [
+      "./frontend"
+    ]
   },
   "scripts": {
     "build": "tsc",
@@ -35,6 +37,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "react-i18next": "^13.0.1",
+    "serverless-deployment-bucket": "^1.6.0",
     "serverless-http": "^2.6.1",
     "winston": "^3.8.2"
   },

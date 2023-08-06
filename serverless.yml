@@ -3,6 +3,7 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-plugin-typescript
+  - serverless-deployment-bucket
 
 # custom:
 #  profiles:
@@ -12,6 +13,9 @@ plugins:
 provider:
   name: aws
   runtime: nodejs18.x
+  region: eu-north-1
+  deploymentBucket:
+    name: haverim-app-serverless
 #  profile: ${self:custom.profiles.${sls:stage}}
 
 functions:
@@ -19,3 +23,5 @@ functions:
     handler: src/index.handler
     events:
       - httpApi: '*'
+
+
