@@ -62,7 +62,7 @@ const BarcodeScanner = ({ paused, onFailed, onSuccess }: Props) => {
   })
 
   return (
-    <Box sx={{ width: '100%', height: '60svh', position: 'relative' }}>
+    <Box sx={{ width: '100%', height: '55svh', overflow: 'hidden', mt: 3, position: 'relative' }}>
       <Box
         sx={{
           position: 'absolute',
@@ -75,7 +75,6 @@ const BarcodeScanner = ({ paused, onFailed, onSuccess }: Props) => {
           borderBottom: '20svh solid rgba(0, 0, 0, 0.2)',
           borderLeft: '8vw solid rgba(0, 0, 0, 0.2)',
           borderRight: '8vw solid rgba(0, 0, 0, 0.2)',
-          borderRadius: '24px',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',

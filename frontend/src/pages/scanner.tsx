@@ -1,6 +1,7 @@
+import BaseDialog from '@/components/elements/BaseDialog'
 import BarcodeScanner from '@/components/modules/BarcodeScanner'
 import useStaticTranslation from '@/hooks/useStaticTranslation'
-import { Box, Button, Dialog } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
@@ -46,9 +47,9 @@ const ScannerPage = () => {
 
   return (
     <>
-      <Dialog open={openDialog} onClose={onClose} sx={{ '& .MuiPaper-root': { width: '100%', borderRadius: '24px', margin: '0px', padding: 0 } }}>
+      <BaseDialog open={openDialog} onClose={onClose}>
         <BarcodeScanner paused={!openDialog} onSuccess={handleSuccess} onFailed={handlFailed} />
-      </Dialog>
+      </BaseDialog>
       <Box mt={2} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', px: 4, py: 2 }}>
         {medicine && (
           <Box p={2} overflow={'auto'} maxHeight={500} width={'100%'}>
