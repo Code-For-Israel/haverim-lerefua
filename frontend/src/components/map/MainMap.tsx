@@ -1,16 +1,14 @@
+import MapDrawer from '@/components/map/MapDrawer'
 import MapFilters from '@/components/map/MapFilters'
 import MapLocationDialog from '@/components/map/MapLocationDialog'
 import MapPin from '@/components/map/MapPin'
-import useStaticTranslation from '@/hooks/useStaticTranslation'
+import PlacesAutocomplete from '@/components/map/PlacesAutocomplete'
 import { calculateDistance } from '@/util/mapFunctions'
-import { Box, Button, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { GoogleMap, MarkerF } from '@react-google-maps/api'
 import type { Location } from 'LocationTypes'
 import mixpanel from 'mixpanel-browser'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import LoaderOverlay from '../elements/LoaderOverlay'
-import LocationPreviewItem from '../elements/LocationPreviewItem'
-import PlacesAutocomplete from './PlacesAutocomplete'
+import { memo, useCallback, useEffect, useRef, useState } from 'react'
 
 const mapContainerStyle = {
   width: '100%',
@@ -28,15 +26,11 @@ type Props = {
   locations: Location[]
   openDialog: boolean
   closeDialog: () => void
-  handleNavigation: (l: Location) => void
   loadingLocations: boolean
   filter?: string | string[]
-  hasLotsOfMedicine?: boolean
-  handleCantGo: () => void
 }
 
-const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog, handleCantGo, hasLotsOfMedicine, handleNavigation }: Props) => {
-  const { t } = useStaticTranslation()
+const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog }: Props) => {
   const mapRef = useRef<google.maps.Map>()
   const [userPosition, setUserPosition] = useState<google.maps.LatLngLiteral | null>(null)
   const [mapLocations, setMapLocations] = useState<Location[]>(locations)
@@ -65,7 +59,7 @@ const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog,
 
   const filteredLocations = mapLocations
     .filter((l: Location) => (filter === 'store_cold' ? `${l.RefrigeratedMedicines_c}`.toLowerCase() === 'true' : true))
-    .slice(0, 12)
+    .slice(0, 20)
 
   const handleMapIdle = useCallback(() => {
     const bounds = mapRef.current?.getBounds()
@@ -94,10 +88,16 @@ const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog,
   const focusMap = (address: google.maps.LatLngLiteral | google.maps.LatLng, bounds?: google.maps.LatLngBounds) => {
     if (bounds) {
       mapRef.current?.fitBounds(bounds)
+      mapRef.current?.setZoom(14)
     } else {
       mapRef.current?.setZoom(15)
       mapRef.current?.panTo(address)
     }
+  }
+
+  const handlePinClick = (location: Location) => {
+    const listItem = document.getElementById(`listLocation-${location._id}`)
+    listItem?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   return (
@@ -152,7 +152,7 @@ const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog,
         >
           {filteredLocations.map((l, index) => {
             if (l.Coordinates_c) {
-              return <MapPin key={index} location={l} />
+              return <MapPin key={index} location={l} onClick={handlePinClick} />
             }
           })}
           {userPosition && (
@@ -167,51 +167,9 @@ const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog,
         </GoogleMap>
       </Box>
       <MapLocationDialog open={openDialog} onClose={closeDialog} onLocationApproved={handleLocationApproved} />
-      <Box
-        sx={{
-          borderRadius: '30px 30px 0 0',
-          py: 2,
-          width: '100%',
-          background: 'white',
-          height: '40svh',
-          position: 'absolute',
-          bottom: 0,
-          boxShadow: '0px -3px 6px 0px rgba(0, 0, 0, 0.08)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Box
-          sx={{
-            pb: 2,
-            pl: 4,
-            pr: 3,
-            height: '100%',
-            overflow: 'auto',
-            width: '100%',
-          }}
-        >
-          <LoaderOverlay loading={loadingLocations} />
-          {filteredLocations.map((l, index) => (
-            <LocationPreviewItem key={index} onClick={handleNavigation} location={l} focusMap={focusMap} />
-          ))}
-          {!loadingLocations && filteredLocations.length < 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', height: '100%' }}>
-              <Typography variant="body1">{t('no_locations_found')}</Typography>
-            </Box>
-          )}
-        </Box>
-        {hasLotsOfMedicine && (
-          <Box sx={{ width: '100%', pt: 1, display: 'flex', justifyContent: 'center' }}>
-            <Button variant="text" color="info" fullWidth={false} onClick={handleCantGo}>
-              {t('cant_go_to_location')}
-            </Button>
-          </Box>
-        )}
-      </Box>
+      <MapDrawer locations={filteredLocations} focusMap={focusMap} loadingLocations={loadingLocations} />
     </Box>
   )
 }
 
-export default MainMap
+export default memo(MainMap)
