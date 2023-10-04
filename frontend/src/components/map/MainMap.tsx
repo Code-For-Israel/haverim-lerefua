@@ -3,7 +3,6 @@ import MapFilters from '@/components/map/MapFilters'
 import MapLocationDialog from '@/components/map/MapLocationDialog'
 import MapPin from '@/components/map/MapPin'
 import PlacesAutocomplete from '@/components/map/PlacesAutocomplete'
-import { calculateDistance } from '@/util/mapFunctions'
 import { Box } from '@mui/material'
 import { GoogleMap, MarkerF } from '@react-google-maps/api'
 import type { Location } from 'LocationTypes'
@@ -23,65 +22,37 @@ const mapCenter = {
 const initialZoom = 14
 
 type Props = {
-  locations: Location[]
+  locations?: Location[]
   openDialog: boolean
   closeDialog: () => void
   loadingLocations: boolean
-  filter?: string | string[]
+  updateLocationsCoordinates: (position: google.maps.LatLngLiteral) => void
+  fetchError: string | null
 }
 
-const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog }: Props) => {
+const MainMap = ({ locations, openDialog, loadingLocations, closeDialog, fetchError, updateLocationsCoordinates }: Props) => {
   const mapRef = useRef<google.maps.Map>()
   const [userPosition, setUserPosition] = useState<google.maps.LatLngLiteral | null>(null)
-  const [mapLocations, setMapLocations] = useState<Location[]>(locations)
-  const sortedCache = useRef<{ [key: string]: Location[] }>({})
-
-  const updateLocationsCoordinates = (position: google.maps.LatLngLiteral) => {
-    const cached = sortedCache.current[JSON.stringify(position)]
-    if (cached) {
-      return cached
-    }
-    const locs = locations.reduce((acc: Location[], l: Location) => {
-      if (l.Coordinates_c) {
-        const distance = calculateDistance(position, l.Coordinates_c)
-        return [...acc, { ...l, distance }]
-      }
-      return acc
-    }, [])
-    const sorted = locs.sort((a, b) => (a.distance as number) - (b.distance as number))
-    sortedCache.current = { [JSON.stringify(position)]: sorted }
-    return sorted
-  }
+  const [mapLocations, setMapLocations] = useState<Location[] | undefined>(locations)
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map
   }, [])
 
-  const filteredLocations = mapLocations
-    .filter((l: Location) => (filter === 'store_cold' ? `${l.RefrigeratedMedicines_c}`.toLowerCase() === 'true' : true))
-    .slice(0, 20)
-
   const handleMapIdle = useCallback(() => {
+    if (!mapRef.current || !locations) return
     const bounds = mapRef.current?.getBounds()
-    let locs = [...locations]
-    if (userPosition) {
-      locs = updateLocationsCoordinates(userPosition)
-    }
-    const filtered = locs.filter(l => !!l.Coordinates_c && bounds?.contains(l.Coordinates_c))
+    const filtered = locations.filter(l => !!l.Coordinates_c && bounds?.contains(l.Coordinates_c))
     setMapLocations(filtered)
-  }, [userPosition, locations])
-
-  useEffect(() => {
-    setMapLocations(locations)
-    handleMapIdle()
-  }, [locations, loadingLocations])
+  }, [locations])
 
   const handleLocationApproved = (position: GeolocationPosition) => {
     mixpanel.track('location_approved')
-    const { latitude: lat, longitude: lng } = position.coords
+    const userPosition = { lat: position.coords.latitude, lng: position.coords.longitude }
     mapRef.current?.setZoom(14)
-    mapRef.current?.panTo({ lat, lng })
-    setUserPosition({ lat, lng })
+    mapRef.current?.panTo(userPosition)
+    setUserPosition(userPosition)
+    updateLocationsCoordinates(userPosition)
     closeDialog()
   }
 
@@ -95,10 +66,16 @@ const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog 
     }
   }
 
+  useEffect(() => {
+    handleMapIdle()
+  }, [locations])
+
   const handlePinClick = (location: Location) => {
     const listItem = document.getElementById(`listLocation-${location._id}`)
-    listItem?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    listItem?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }
+
+  const slicedLocations = mapLocations?.slice(0, 20)
 
   return (
     <Box
@@ -150,11 +127,12 @@ const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog 
             ],
           }}
         >
-          {filteredLocations.map((l, index) => {
-            if (l.Coordinates_c) {
-              return <MapPin key={index} location={l} onClick={handlePinClick} />
-            }
-          })}
+          {slicedLocations &&
+            slicedLocations.map((l, index) => {
+              if (l.Coordinates_c) {
+                return <MapPin key={index} location={l} onClick={handlePinClick} />
+              }
+            })}
           {userPosition && (
             <MarkerF
               position={userPosition}
@@ -167,7 +145,7 @@ const MainMap = ({ locations, openDialog, filter, loadingLocations, closeDialog 
         </GoogleMap>
       </Box>
       <MapLocationDialog open={openDialog} onClose={closeDialog} onLocationApproved={handleLocationApproved} />
-      <MapDrawer locations={filteredLocations} focusMap={focusMap} loadingLocations={loadingLocations} />
+      <MapDrawer fetchError={fetchError} locations={slicedLocations} focusMap={focusMap} loadingLocations={loadingLocations} />
     </Box>
   )
 }
