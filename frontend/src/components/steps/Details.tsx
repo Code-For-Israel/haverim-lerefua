@@ -22,7 +22,7 @@ const Details = () => {
       const { fullName, town, street, houseNumber } = data
       messageArr.splice(1, 1, t('wa_personal_info', { fullName, fullAddress: `${street} ${houseNumber}, ${town}` }))
     }
-    const medicineListString = medicines?.map(m => `${m.Name}${m.expiryState === 'inAMonth' && ` - ${t('close_to_expire')}`}`).join('\n')
+    const medicineListString = medicines?.map(m => `${m.Name}${m.expiryState === 'inAMonth' ? ` - ${t('close_to_expire')}` : ''}`).join('\n')
     if (medicineListString) {
       messageArr.push(medicineListString)
     } else {
