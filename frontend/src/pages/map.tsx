@@ -84,7 +84,6 @@ const MapPage = () => {
         <title>חברים לרפואה - מפת מוקדים</title>
         <meta name="description" content="חברים לרפואה - מפת מוקדים" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <Container maxWidth={'md'} sx={{ boxShadow: 2, p: 0, height: '100svh' }}>
         <LoaderOverlay loading={isFetching} />
