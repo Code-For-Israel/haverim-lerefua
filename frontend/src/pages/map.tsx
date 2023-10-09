@@ -5,6 +5,7 @@ import { Container } from '@mui/material'
 import { useJsApiLoader } from '@react-google-maps/api'
 import type { Location } from 'LocationTypes'
 import axios from 'axios'
+import mixpanel from 'mixpanel-browser'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -50,8 +51,9 @@ const MapPage = () => {
           setLocations(locs)
         }
       } catch (e: any) {
-        console.log(e.message)
         setError(e.message)
+        mixpanel.track('Error', { error: e.message, on: 'fetchLocations; MapPage' })
+
         setLocations([])
       } finally {
         setIsFetching(false)

@@ -1,5 +1,6 @@
 import { MedicineItemType } from 'MedicineTypes'
 import axios from 'axios'
+import mixpanel from 'mixpanel-browser'
 
 export const checkMedicineDetails = async (medicine: MedicineItemType) => {
   let barcode = medicine.barcodes.split(' ')[0]
@@ -11,7 +12,7 @@ export const checkMedicineDetails = async (medicine: MedicineItemType) => {
         dragRegNum: medicine.dragRegNum,
       })
       .catch(e => {
-        console.log(e)
+        mixpanel.track('Error', { error: e.message, on: 'checkMedicineDetails' })
       })
     if (medicineDetails && medicineDetails.data) {
       const packageWithBarcode = medicineDetails.data.packages.filter((p: any) => p.barcode.trim().length > 0)

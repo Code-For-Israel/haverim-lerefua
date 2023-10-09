@@ -1,5 +1,6 @@
 import useStaticTranslation from '@/hooks/useStaticTranslation'
 import { Button, Stack, Typography } from '@mui/material'
+import mixpanel from 'mixpanel-browser'
 import { memo, useState } from 'react'
 import BaseDialog from '../elements/BaseDialog'
 
@@ -19,12 +20,14 @@ const MapLocationDialog = ({ open: openDialog, onClose, onLocationApproved }: Pr
         if (error.code == error.PERMISSION_DENIED) {
           console.log('User denied the request for Geolocation.')
           setError(t('location_declined'))
+          mixpanel.track('Error', { error: 'Location declined', on: 'handleLocationSelected; mapLocationDialog' })
         } else {
           onClose()
         }
       })
     } else {
       console.log('Geolocation not supported')
+      mixpanel.track('Error', { error: 'Geolocation not supported', on: 'handleLocationSelected; mapLocationDialog' })
     }
   }
 
