@@ -1,5 +1,6 @@
 import { FormContext } from '@/context/FormWizardProvider'
 import { FormValuesType } from 'FormTypes'
+import axios from 'axios'
 import mixpanel from 'mixpanel-browser'
 import { useRouter } from 'next/router'
 import { useContext } from 'react'
@@ -47,18 +48,16 @@ const useFormWizard = () => {
     router.reload()
   }
 
-  const submitData = async (endStage: string) => {
+  const submitData = async (endStage: string, moreData?: any) => {
     const request = {
-      id:
-        'THIS_IS_NOT_REAL_' +
-        Math.random()
-          .toString(36)
-          .substring(2, 16 + 2),
+      id: Math.random()
+        .toString(36)
+        .substring(2, 16 + 2),
       endStage: endStage,
-      data: formValues,
+      data: moreData ? { ...formValues, ...moreData } : formValues,
     }
     setLoading(true)
-    // await axios.post('https://hook.eu2.make.com/r1adjpw2i6ml66x9w6uxm7w9pw4fz3h7', request).catch(err => console.log(err))
+    await axios.post('https://hook.eu2.make.com/8ppxngq9cxe8tlfdx2vmmp75lfvmiuv2', request).catch(err => console.log(err))
     mixpanel.track('data_submitted', { endStage: endStage })
     setLoading(false)
   }
