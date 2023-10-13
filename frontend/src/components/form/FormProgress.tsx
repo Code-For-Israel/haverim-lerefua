@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box } from '@mui/material';
 
 type Props = { progress: number; totalSteps: number }
 
@@ -14,7 +14,8 @@ const FormProgress = ({ progress, totalSteps }: Props) => {
         overflow: 'hidden',
         position: 'relative',
         borderRadius: 20,
-        mb: 4,
+        mb: 2,
+        mt: 2,
       }}
     >
       <Box

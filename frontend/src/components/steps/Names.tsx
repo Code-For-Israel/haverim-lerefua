@@ -159,7 +159,7 @@ const Names = () => {
         open={!!selectedMedicine}
         onOpen={() => false}
         onClose={handleClose}
-        sx={{ '& .MuiPaper-root': { borderTopLeftRadius: 36, borderTopRightRadius: 36, height: '55%', overflow: 'hidden' } }}
+        sx={{ '& .MuiPaper-root': { borderTopLeftRadius: 36, borderTopRightRadius: 36, height: '55%', minHeight: '350px', overflow: 'hidden' } }}
       >
         <Box
           sx={{
@@ -172,7 +172,9 @@ const Names = () => {
             left: 'calc(50% - 20px)',
           }}
         />
+        <Box sx={{overflow: 'scroll'}}>
         {selectedMedicine && <AddMedicine onSave={handleSave} medicine={selectedMedicine} />}
+        </Box>
       </SwipeableDrawer>
       <Button
         variant="contained"
