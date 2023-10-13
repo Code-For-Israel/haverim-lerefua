@@ -36,19 +36,20 @@ const FormStep = () => {
           flexDirection: 'column',
           justifyContent: 'space-between',
           alignItems: 'center',
-          px: 3,
-          pb: 4,
         }}
       >
         <Header />
         {showProgress && <FormProgress progress={stepHistory.length} totalSteps={totalSteps} />}
         <Box
           sx={{
-            display: 'flex',
+            display: 'block',
             width: '100%',
             height: showProgress ? 'calc(100% - 150px)' : '100%',
             position: 'relative',
             flex: 1,
+            py: 4,
+            px: 3,
+            overflow: 'scroll',
           }}
         >
           {Component && <Component />}

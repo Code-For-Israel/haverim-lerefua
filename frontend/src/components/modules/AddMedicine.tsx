@@ -23,7 +23,7 @@ const AddMedicine = ({ medicine, onSave }: Props) => {
       sx={{ width: '100%', overflowY: 'auto', overflowX: 'hidden', position: 'relative' }}
     >
       <Stack pt={3} justifyContent={'center'} alignItems={'center'} textAlign={'center'} overflow={'hidden'} whiteSpace={'nowrap'}>
-        <Typography variant="h3" sx={{ mb: 2 }}>
+        <Typography variant="h3" sx={{ mb: 2 }} whiteSpace={'normal'} textAlign={'start'}>
           {t('will_expire_soon')}
         </Typography>
         <Typography
