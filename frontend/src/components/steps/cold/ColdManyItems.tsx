@@ -12,6 +12,7 @@ const ColdManyItems = () => {
     hasExpensive: formData.hasExpensive || false,
     noExpensiveOrCold: formData.noExpensiveOrCold || false,
   })
+  const { hasMoreProducts } = formData;
   const router = useRouter()
 
   const { hasCold, hasExpensive, noExpensiveOrCold: noBoth } = data
@@ -34,7 +35,9 @@ const ColdManyItems = () => {
 
   const onSubmit = () => {
     updateFormData(data)
-    if (!!noBoth) {
+    if (!!noBoth && hasMoreProducts) {
+      stepTo('details')
+    } else if (!!noBoth) {
       submitData('map')
       router.push({ pathname: '/map' })
     } else {
