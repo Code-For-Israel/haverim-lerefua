@@ -56,7 +56,7 @@ const Names = () => {
 
   const debouncedQuery = useDebounce(searchValue, 600)
   const { stepTo, formData, updateFormData, submitData } = useFormWizard()
-  const { medicineQuantity, hasExpensive, hasCold, expensiveDetected } = formData
+  const { medicineQuantity, hasExpensive, hasCold, expensiveDetected, hasMoreProducts } = formData
   const isManyMedicines = medicineQuantity && medicineQuantity !== '1-10'
   const hideText = searchValue.trim().length > 2
 
@@ -130,7 +130,7 @@ const Names = () => {
 
   const handleSkip = () => {
     mixpanel.track('skip_names')
-    if (hasExpensive || expensiveDetected) {
+    if (hasExpensive || expensiveDetected || hasMoreProducts) {
       stepTo('details')
     } else {
       submitData('map')
