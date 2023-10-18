@@ -121,7 +121,11 @@ const Names = () => {
         const expensiveDetected = map.size > 0;
         updateFormData({ expensiveDetected })
       }).catch(e => {
-        mixpanel.track('Error', { error: 'Fetch is expensive', on: 'handleDone', reason: e.toString() })
+        mixpanel.track('Error', {
+          error: 'Fetch is expensive',
+          on: 'handleDone',
+          reason: e.message || e.toString(),
+        })
         console.error(e);
       }).finally(() => setLoadingDone(false))
     }

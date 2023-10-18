@@ -57,12 +57,20 @@ const useFormWizard = () => {
       data: moreData ? { ...formValues, ...moreData } : formValues,
     }
     setLoading(true)
+    const url = 'https://hook.eu2.make.com/8ppxngq9cxe8tlfdx2vmmp75lfvmiuv2';
     await axios.post(
-      'https://hook.eu2.make.com/8ppxngq9cxe8tlfdx2vmmp75lfvmiuv2',
+      url,
       request,
     ).catch(err => {
       console.log(err);
-      mixpanel.track('Error', { error: 'Submit details', on: 'submitData; useFormWizard', reason: err?.message || err?.toString() })
+      mixpanel.track('Error', {
+        error: 'Submit details',
+        on: 'submitData; useFormWizard',
+        reason: err?.message || err?.toString(),
+        errorContext: {
+          requestUrl: url
+        }
+      })
     })
     mixpanel.track('data_submitted', { endStage: endStage })
     setLoading(false)
