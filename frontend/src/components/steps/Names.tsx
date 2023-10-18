@@ -4,6 +4,7 @@ import MedicineSuggestions from '@/components/modules/names/MedicineSuggestions'
 import useDebounce from '@/hooks/useDebounce'
 import useFormWizard from '@/hooks/useFormWizard'
 import useStaticTranslation from '@/hooks/useStaticTranslation'
+import chunk from '@/util/chunk'
 import { checkMedicineDetails } from '@/util/medicineFunctions'
 import { Box, Button, CircularProgress, Stack, SwipeableDrawer, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
@@ -47,6 +48,38 @@ const fetchIsExpensive = async (barcodes: string[]) => {
   mixpanel.track('is_expensive_query', { barcodes })
   const expensiveMap = new Set(res.data.records.map((r: any) => r.fields?.barcode).filter((x: any) => !!x));
   return expensiveMap
+}
+
+const getBarcodes = async (medicines: MedicineItemType[]) => {
+  const barcodes = medicines.map(m => m.barcodes).flat().filter(x => !!x).flat();
+  const medicinesWithout = medicines.filter(m => !m.barcodes || !m.barcodes.length);
+  
+  const url = 'https://israeldrugs.health.gov.il/GovServiceList/IDRServer/GetSpecificDrug'
+  const extraBarcodes: string[] = [];
+  const chunks = chunk(medicinesWithout, 3);
+  for (const arr of chunks) {
+    await Promise.allSettled(arr.map(async medicine => {
+      const body = {dragRegNum: medicine.dragRegNum}
+      const res = await axios.post(url, body).catch(err => {
+        mixpanel.track('Error', {
+          error: 'GetSpecificDrug',
+          on: 'getBarcodes; submitData; useFormWizard',
+          reason: err?.message || err?.toString(),
+          errorContext: {
+            requestUrl: url
+          }
+        });
+      })
+      if (res) {
+        const newBarcodes = res.data?.packages?.map((p: any) => p?.barcode) ?? [];
+        mixpanel.track('get_specific_drug', newBarcodes)
+        extraBarcodes.push(...newBarcodes)
+        return newBarcodes;
+      }
+    }))
+  }
+
+  return [...barcodes, ...extraBarcodes]
 }
 
 const Names = () => {
@@ -114,9 +147,10 @@ const Names = () => {
 
   const handleDone = async () => {
     const relevantExpiry: ExpiryState[] = ['inAMonth', 'noOrUnknown'];
-    const barcodes = savedMedicines.filter(m => relevantExpiry.includes(m.expiryState || 'noOrUnknown')).map(m => m.barcodes).flat().filter(x => !!x);
-    if (barcodes?.length) {
+    const relevantMedicine = savedMedicines.filter(m => relevantExpiry.includes(m.expiryState || 'noOrUnknown'));
+    if (relevantMedicine?.length) {
       setLoadingDone(true);
+      const barcodes = await getBarcodes(relevantMedicine)
       await fetchIsExpensive(barcodes).then((map) => {
         const expensiveDetected = map.size > 0;
         updateFormData({ expensiveDetected })
