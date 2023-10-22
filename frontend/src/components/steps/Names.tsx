@@ -79,7 +79,7 @@ const getBarcodes = async (medicines: MedicineItemType[]) => {
     }))
   }
 
-  return [...barcodes, ...extraBarcodes]
+  return [...barcodes, ...extraBarcodes].filter(x => !!x)
 }
 
 const Names = () => {
