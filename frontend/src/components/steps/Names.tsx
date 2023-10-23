@@ -7,7 +7,7 @@ import useStaticTranslation from '@/hooks/useStaticTranslation'
 import { checkMedicineDetails } from '@/util/medicineFunctions'
 import { Box, Button, CircularProgress, Stack, SwipeableDrawer, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { ExpiryState, MedicineItemType } from 'MedicineTypes'
+import { MedicineItemType } from 'MedicineTypes'
 import axios from 'axios'
 import { easeInOut, motion } from 'framer-motion'
 import mixpanel from 'mixpanel-browser'
@@ -36,18 +36,18 @@ const searchMedicines = (query: string) => async () => {
   return []
 }
 
-const fetchIsExpensive = async (barcodes: string[]) => {
-  const filterByFormula = `OR(${barcodes.map(barcode => `{barcode}=${barcode}`).join(',')})`
-  const res = await axios.get(`https://api.airtable.com/v0/appUVgU4oWTP7Pyqb/medicines?maxRecords=${barcodes.length}&view=Grid%20view&filterByFormula=${filterByFormula}`, {
-    headers: {
-      Authorization: 'Bearer patBHoVhSqT7EqKqP.6b26e6f8c093e17e14a124a3568cb9aeeff45091d7d8c2cc6c15aad0b3f40dc0'
-    }
-  })
+// const fetchIsExpensive = async (barcodes: string[]) => {
+//   const filterByFormula = `OR(${barcodes.map(barcode => `{barcode}=${barcode}`).join(',')})`
+//   const res = await axios.get(`https://api.airtable.com/v0/appUVgU4oWTP7Pyqb/medicines?maxRecords=${barcodes.length}&view=Grid%20view&filterByFormula=${filterByFormula}`, {
+//     headers: {
+//       Authorization: 'Bearer patBHoVhSqT7EqKqP.6b26e6f8c093e17e14a124a3568cb9aeeff45091d7d8c2cc6c15aad0b3f40dc0'
+//     }
+//   })
   
-  mixpanel.track('is_expensive_query', { barcodes })
-  const expensiveMap = new Set(res.data.records.map((r: any) => r.fields?.barcode).filter((x: any) => !!x));
-  return expensiveMap
-}
+//   mixpanel.track('is_expensive_query', { barcodes })
+//   const expensiveMap = new Set(res.data.records.map((r: any) => r.fields?.barcode).filter((x: any) => !!x));
+//   return expensiveMap
+// }
 
 const Names = () => {
   const [searchValue, setSearchValue] = useState('')
@@ -113,22 +113,22 @@ const Names = () => {
   }
 
   const handleDone = async () => {
-    const relevantExpiry: ExpiryState[] = ['inAMonth', 'noOrUnknown'];
-    const barcodes = savedMedicines.filter(m => relevantExpiry.includes(m.expiryState || 'noOrUnknown')).map(m => m.barcodes).flat().filter(x => !!x);
-    if (barcodes?.length) {
-      setLoadingDone(true);
-      await fetchIsExpensive(barcodes).then((map) => {
-        const expensiveDetected = map.size > 0;
-        updateFormData({ expensiveDetected })
-      }).catch(e => {
-        mixpanel.track('Error', {
-          error: 'Fetch is expensive',
-          on: 'handleDone',
-          reason: e.message || e.toString(),
-        })
-        console.error(e);
-      }).finally(() => setLoadingDone(false))
-    }
+    // const relevantExpiry: ExpiryState[] = ['inAMonth', 'noOrUnknown'];
+    // const barcodes = savedMedicines.filter(m => relevantExpiry.includes(m.expiryState || 'noOrUnknown')).map(m => m.barcodes).flat().filter(x => !!x);
+    // if (barcodes?.length) {
+    //   setLoadingDone(true);
+    //   await fetchIsExpensive(barcodes).then((map) => {
+    //     const expensiveDetected = map.size > 0;
+    //     updateFormData({ expensiveDetected })
+    //   }).catch(e => {
+    //     mixpanel.track('Error', {
+    //       error: 'Fetch is expensive',
+    //       on: 'handleDone',
+    //       reason: e.message || e.toString(),
+    //     })
+    //     console.error(e);
+    //   }).finally(() => setLoadingDone(false))
+    // }
     stepTo('names-summary')
   }
 
