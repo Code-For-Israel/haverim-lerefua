@@ -5,7 +5,7 @@ import useDebounce from '@/hooks/useDebounce'
 import useFormWizard from '@/hooks/useFormWizard'
 import useStaticTranslation from '@/hooks/useStaticTranslation'
 import { checkMedicineDetails } from '@/util/medicineFunctions'
-import { Box, Button, Stack, SwipeableDrawer, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Stack, SwipeableDrawer, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { MedicineItemType } from 'MedicineTypes'
 import axios from 'axios'
@@ -36,9 +36,23 @@ const searchMedicines = (query: string) => async () => {
   return []
 }
 
+// const fetchIsExpensive = async (barcodes: string[]) => {
+//   const filterByFormula = `OR(${barcodes.map(barcode => `{barcode}=${barcode}`).join(',')})`
+//   const res = await axios.get(`https://api.airtable.com/v0/appUVgU4oWTP7Pyqb/medicines?maxRecords=${barcodes.length}&view=Grid%20view&filterByFormula=${filterByFormula}`, {
+//     headers: {
+//       Authorization: 'Bearer patBHoVhSqT7EqKqP.6b26e6f8c093e17e14a124a3568cb9aeeff45091d7d8c2cc6c15aad0b3f40dc0'
+//     }
+//   })
+  
+//   mixpanel.track('is_expensive_query', { barcodes })
+//   const expensiveMap = new Set(res.data.records.map((r: any) => r.fields?.barcode).filter((x: any) => !!x));
+//   return expensiveMap
+// }
+
 const Names = () => {
   const [searchValue, setSearchValue] = useState('')
   const [animate, setAnimate] = useState<string | null>(null)
+  const [loadingDone, setLoadingDone] = useState(false)
 
   const debouncedQuery = useDebounce(searchValue, 600)
   const { stepTo, formData, updateFormData, submitData } = useFormWizard()
@@ -94,12 +108,27 @@ const Names = () => {
 
   const saveFormState = (medicinList: MedicineItemType[]) => {
     setSavedMedicines(medicinList)
-    const expensiveDetected = medicinList.some((m: MedicineItemType) => m.isRare || m.isExpensive)
     const expiringDetected = medicinList.some((m: MedicineItemType) => m.expiryState === 'inAMonth')
     updateFormData({ medicines: medicinList, expensiveDetected, expiringDetected })
   }
 
-  const handleDone = () => {    
+  const handleDone = async () => {
+    // const relevantExpiry: ExpiryState[] = ['inAMonth', 'noOrUnknown'];
+    // const barcodes = savedMedicines.filter(m => relevantExpiry.includes(m.expiryState || 'noOrUnknown')).map(m => m.barcodes).flat().filter(x => !!x);
+    // if (barcodes?.length) {
+    //   setLoadingDone(true);
+    //   await fetchIsExpensive(barcodes).then((map) => {
+    //     const expensiveDetected = map.size > 0;
+    //     updateFormData({ expensiveDetected })
+    //   }).catch(e => {
+    //     mixpanel.track('Error', {
+    //       error: 'Fetch is expensive',
+    //       on: 'handleDone',
+    //       reason: e.message || e.toString(),
+    //     })
+    //     console.error(e);
+    //   }).finally(() => setLoadingDone(false))
+    // }
     stepTo('names-summary')
   }
 
@@ -172,18 +201,19 @@ const Names = () => {
             left: 'calc(50% - 20px)',
           }}
         />
-        <Box sx={{overflow: 'scroll'}}>
-        {selectedMedicine && <AddMedicine onSave={handleSave} medicine={selectedMedicine} />}
+        <Box sx={{ overflow: 'scroll' }}>
+          {selectedMedicine && <AddMedicine onSave={handleSave} medicine={selectedMedicine} />}
         </Box>
       </SwipeableDrawer>
-      <Button
-        variant="contained"
-        disabled={savedMedicines.length < 1}
-        sx={{ opacity: savedMedicines.length > 0 || (savedMedicines.length < 1 && hideText) ? 1 : 0 }}
-        onClick={handleDone}
-      >
-        {t('im_done')} ({savedMedicines.length})
-      </Button>
+      {loadingDone ? <Button variant="contained" disabled={true}><CircularProgress size={16}/></Button> :
+        <Button
+          variant="contained"
+          disabled={savedMedicines.length < 1}
+          sx={{ opacity: savedMedicines.length > 0 || (savedMedicines.length < 1 && hideText) ? 1 : 0 }}
+          onClick={handleDone}
+        >
+          {t('im_done')} ({savedMedicines.length})
+        </Button>}
     </Stack>
   )
 }
