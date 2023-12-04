@@ -1,18 +1,61 @@
 import MedicinePreviewItem from '@/components/elements/MedicinePreviewItem'
 import useFormWizard from '@/hooks/useFormWizard'
 import useStaticTranslation from '@/hooks/useStaticTranslation'
-import { Box, Button, Stack, Typography } from '@mui/material'
-import { MedicineItemType } from 'MedicineTypes'
+import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material'
+import { ExpiryState, MedicineItemType } from 'MedicineTypes'
+import axios from 'axios'
+import mixpanel from 'mixpanel-browser'
 import { useRouter } from 'next/router'
+import { useCallback, useState } from 'react'
+
+const fetchIsExpensive = async (dragRegNums: string[]) => {
+  const filterByFormula = `OR(${dragRegNums.map(dragRegNum => `{dragRegNum}="${dragRegNum}"`).join(',')})`
+  const res = await axios.get(`https://api.airtable.com/v0/appUVgU4oWTP7Pyqb/medicines?maxRecords=${dragRegNums.length}&filterByFormula=${filterByFormula}`, {
+    headers: {
+      Authorization: 'Bearer patBHoVhSqT7EqKqP.6b26e6f8c093e17e14a124a3568cb9aeeff45091d7d8c2cc6c15aad0b3f40dc0'
+    }
+  })
+  mixpanel.track('is_expensive_query', { dragRegNums })
+  const expensiveMap = new Set(res.data.records.map((r: any) => r.fields?.dragRegNum).filter((x: any) => !!x));
+  return expensiveMap
+}
 
 const NamesSummary = () => {
   const { stepTo, stepBack, formData, updateFormData, submitData } = useFormWizard()
   const { t } = useStaticTranslation()
   const router = useRouter()
-  const { hasMoreProducts, hasCold, hasExpensive, expensiveDetected, expiringDetected } = formData
+  const { hasMoreProducts, hasCold, hasExpensive, expiringDetected } = formData
   const selectedMedicines = formData?.medicines || []
+  const [loadingDone, setLoadingDone] = useState(false)
 
-  const handleFinish = () => {
+  const isExpensive = useCallback(async () => {
+    const relevantExpiry: ExpiryState[] = ['inAMonth', 'noOrUnknown'];
+    debugger;
+    const dragRegNums = selectedMedicines.filter(m => relevantExpiry.includes(m.expiryState || 'noOrUnknown')).map(m => m.dragRegNum).flat().filter(x => !!x);
+    if (dragRegNums?.length) {
+      debugger;
+      setLoadingDone(true);
+      return await fetchIsExpensive(dragRegNums).then((map) => {
+        debugger;
+        const expensiveDetected = map.size > 0;
+        updateFormData({ expensiveDetected })
+
+        return expensiveDetected
+      }).catch(e => {
+        debugger;
+        mixpanel.track('Error', {
+          error: 'Fetch is expensive',
+          on: 'handleDone',
+          reason: e.message || e.toString(),
+        })
+        console.error(e);
+        return false;
+      }).finally(() => setLoadingDone(false))
+    }
+  }, [selectedMedicines]);
+
+  const handleFinish = async () => {
+    const expensiveDetected = await isExpensive();
     if (hasExpensive || expensiveDetected || hasMoreProducts || expiringDetected) {
       stepTo('details')
     } else {
@@ -53,9 +96,11 @@ const NamesSummary = () => {
           </Stack>
         )}
       </Box>
-      <Button variant="contained" sx={{ mt: 4 }} onClick={handleFinish}>
-        {t('continue')}
-      </Button>
+      {loadingDone ? <Button variant="contained" disabled={true}><CircularProgress size={16} /></Button> :
+        <Button variant="contained" sx={{ mt: 4 }} onClick={handleFinish}>
+          {t('continue')}
+        </Button>}
+
       <Button variant="text" color="info" onClick={handleBack}>
         {t('back_to_medicine_search')}
       </Button>
