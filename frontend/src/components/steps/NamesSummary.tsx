@@ -30,19 +30,15 @@ const NamesSummary = () => {
 
   const isExpensive = useCallback(async () => {
     const relevantExpiry: ExpiryState[] = ['inAMonth', 'noOrUnknown'];
-    debugger;
     const dragRegNums = selectedMedicines.filter(m => relevantExpiry.includes(m.expiryState || 'noOrUnknown')).map(m => m.dragRegNum).flat().filter(x => !!x);
     if (dragRegNums?.length) {
-      debugger;
       setLoadingDone(true);
       return await fetchIsExpensive(dragRegNums).then((map) => {
-        debugger;
         const expensiveDetected = map.size > 0;
         updateFormData({ expensiveDetected })
 
         return expensiveDetected
       }).catch(e => {
-        debugger;
         mixpanel.track('Error', {
           error: 'Fetch is expensive',
           on: 'handleDone',
