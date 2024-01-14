@@ -77,7 +77,7 @@
   "opening_hours": "שעות פעילות",
   "medicine_name": "שם התרופה",
   "wa_app_intro": "_זוהי פניה דיגיטלית_",
-  "wa_personal_info": "שלום, שמי {{fullName}}, כתובתי: {{fullAddress}}.",
+  "wa_personal_info": "שלום, שמי {{fullName}}, כתובתי: {{fullAddress}}. טלפון: {{phoneNumber}}. ",
   "wa_app_intro_2": "הפרטים שברצוני לתרום:",
   "close_to_expire": "תוקף התרופה יפוג בחודש הקרוב",
   "wa_default_text": "שלום, הגעתי דרך האתר של חברים לרפואה. \nיש ברשותי תרופות שאשמח לתרום",

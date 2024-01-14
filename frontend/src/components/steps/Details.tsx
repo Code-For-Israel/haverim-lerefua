@@ -19,8 +19,8 @@ const Details = () => {
   const buildMessage = (data?: FormValuesType) => {
     const messageArr = [t('wa_app_intro'), `${t('hello')},`, t('wa_app_intro_2')]
     if (data) {
-      const { fullName, town, street, houseNumber } = data
-      messageArr.splice(1, 1, t('wa_personal_info', { fullName, fullAddress: `${street} ${houseNumber}, ${town}` }))
+      const { fullName, town, street, houseNumber, phoneNumber } = data
+      messageArr.splice(1, 1, t('wa_personal_info', { fullName, phoneNumber, fullAddress: `${street} ${houseNumber}, ${town}` }))
     }
     const medicineListString = medicines?.map(m => `${m.Name}${m.expiryState === 'inAMonth' ? ` - ${t('close_to_expire')}` : ''}`).join('\n')
     if (medicineListString) {
