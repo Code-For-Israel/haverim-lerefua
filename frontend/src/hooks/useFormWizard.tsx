@@ -57,7 +57,7 @@ const useFormWizard = () => {
       data: moreData ? { ...formValues, ...moreData } : formValues,
     }
     setLoading(true)
-    const url = 'https://hook.eu1.make.com/rds8sgidfsfh1sai24ahho1ne3ng2dsd';
+    const url = 'https://hook.eu2.make.com/9oka94wxptdx1rnxagjs1fqo7wwup4c4';
     await axios.post(
       url,
       request,
