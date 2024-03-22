@@ -1,6 +1,5 @@
 import { Box, ButtonBase, ButtonBaseProps, IconButton, Stack, Typography } from '@mui/material'
 import { MedicineItemType } from 'MedicineTypes'
-import { motion } from 'framer-motion'
 import Image from 'next/image'
 import CloseIcon from 'public/icons/close.svg'
 import PlaceholderIcon from 'public/icons/placeholder.svg'
@@ -12,11 +11,10 @@ type Props = {
   onRemove: (medicine: MedicineItemType) => void
   selected: boolean
   index?: number
-  animate?: string | null
   hideLastBorder?: boolean
 } & Omit<ButtonBaseProps, 'onClick'>
 
-const MedicinePreviewItem = ({ medicine, onClick, onRemove, selected, animate, hideLastBorder = false, index = 0 }: Props) => {
+const MedicinePreviewItem = ({ medicine, onClick, onRemove, selected, hideLastBorder = false }: Props) => {
   const { Name, englishName } = medicine
 
   const handleClick = () => {
@@ -47,30 +45,6 @@ const MedicinePreviewItem = ({ medicine, onClick, onRemove, selected, animate, h
           disableRipple
           sx={{ width: 'calc(100% - 30px)', position: 'relative', justifyContent: 'start' }}
         >
-          {selected && animate === medicine._id && (
-            <Box
-              component={motion.div}
-              animate={{
-                opacity: [1, 1, 1, 0],
-                scale: [1, 1.5, 1.5, 1],
-                x: ['calc(0px)', 'calc(-35vw)', 'calc(-40vw)', 'calc(-50vw + 62px)'],
-                y: ['0vh', '0vh', '60vh', '60vh'],
-                transitionEnd: {
-                  display: 'none',
-                },
-              }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.5, delay: 0.4 }}
-              sx={{
-                position: 'absolute',
-                left: 0,
-                zIndex: 1000 + index,
-                ...BASIC_IMAGE_STYLE,
-              }}
-            >
-              <Image src={PlaceholderIcon} alt="medicine" />
-            </Box>
-          )}
           <Box
             sx={{
               mr: 2,

@@ -1,40 +1,40 @@
-import Autocomplete from '@/components/elements/Autocomplete'
 import AddMedicine from '@/components/modules/AddMedicine'
-import MedicineSuggestions from '@/components/modules/names/MedicineSuggestions'
-import useDebounce from '@/hooks/useDebounce'
 import useFormWizard from '@/hooks/useFormWizard'
 import useStaticTranslation from '@/hooks/useStaticTranslation'
 import { checkMedicineDetails } from '@/util/medicineFunctions'
-import { Box, Button, CircularProgress, Stack, SwipeableDrawer, Typography } from '@mui/material'
-import { useQuery } from '@tanstack/react-query'
+import { Box, Button, Stack, SwipeableDrawer, Typography } from '@mui/material'
 import { MedicineItemType } from 'MedicineTypes'
-import axios from 'axios'
 import { easeInOut, motion } from 'framer-motion'
 import mixpanel from 'mixpanel-browser'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import MedicineList from '../modules/names/MedicineList'
 
-const searchMedicines = (query: string) => async () => {
-  const res = await axios.post('https://israeldrugs.health.gov.il/GovServiceList/IDRServer/SearchByName', {
-    val: query,
-    prescription: false,
-    healthServices: false,
-    pageIndex: 1,
-    orderBy: 0,
-  })
-  if (res) {
-    mixpanel.track('search_medicine', { query })
-    const data = res.data.results.map((d: any) => ({
-      _id: `${d.dragEnName}-${d.dragRegNum}`,
-      Name: d.dragHebName,
-      englishName: d.dragEnName,
-      ...d,
-    }))
-    const deDuppedNames = data.filter((m: any, index: number, self: any) => self.findIndex((t: any) => t.englishName === m.englishName) === index)
-    return deDuppedNames
-  }
-  return []
-}
+// const searchMedicines = (query: string) => async () => {
+//   const res = await axios.post(
+//     'https://israeldrugs.health.gov.il/GovServiceList/IDRServer/SearchByName',
+//     {
+//       val: query,
+//       prescription: false,
+//       healthServices: false,
+//       pageIndex: 1,
+//       orderBy: 0,
+//     },
+//     { headers: { 'Content-Type': 'application/json', Accept: '*/*', 'User-Agent': 'Thunder Client (https://www.thunderclient.com)' } },
+//   )
+//   if (res) {
+//     mixpanel.track('search_medicine', { query })
+//     const data = res.data.results.map((d: any) => ({
+//       _id: `${d.dragEnName}-${d.dragRegNum}`,
+//       Name: d.dragHebName,
+//       englishName: d.dragEnName,
+//       ...d,
+//     }))
+//     const deDuppedNames = data.filter((m: any, index: number, self: any) => self.findIndex((t: any) => t.englishName === m.englishName) === index)
+//     return deDuppedNames
+//   }
+//   return []
+// }
 
 // const fetchIsExpensive = async (barcodes: string[]) => {
 //   const filterByFormula = `OR(${barcodes.map(barcode => `{barcode}=${barcode}`).join(',')})`
@@ -43,7 +43,7 @@ const searchMedicines = (query: string) => async () => {
 //       Authorization: 'Bearer patBHoVhSqT7EqKqP.6b26e6f8c093e17e14a124a3568cb9aeeff45091d7d8c2cc6c15aad0b3f40dc0'
 //     }
 //   })
-  
+
 //   mixpanel.track('is_expensive_query', { barcodes })
 //   const expensiveMap = new Set(res.data.records.map((r: any) => r.fields?.barcode).filter((x: any) => !!x));
 //   return expensiveMap
@@ -51,10 +51,8 @@ const searchMedicines = (query: string) => async () => {
 
 const Names = () => {
   const [searchValue, setSearchValue] = useState('')
-  const [animate, setAnimate] = useState<string | null>(null)
-  const [loadingDone, setLoadingDone] = useState(false)
 
-  const debouncedQuery = useDebounce(searchValue, 600)
+  // const debouncedQuery = useDebounce(searchValue, 600)
   const { stepTo, formData, updateFormData, submitData } = useFormWizard()
   const { medicineQuantity, hasExpensive, hasCold, expensiveDetected, hasMoreProducts } = formData
   const isManyMedicines = medicineQuantity && medicineQuantity !== '1-10'
@@ -66,28 +64,28 @@ const Names = () => {
   const [selectedMedicine, setSelectedMedicine] = useState<MedicineItemType | null>(null)
   const [savedMedicines, setSavedMedicines] = useState<MedicineItemType[]>(formData?.medicines || [])
 
-  const {
-    data: medicineData,
-    isFetching,
-    isFetched,
-  } = useQuery(['medicines', debouncedQuery], searchMedicines(debouncedQuery), {
-    enabled: debouncedQuery.trim().length > 2,
-    refetchOnWindowFocus: false,
-    retry: false,
-    initialData: [],
-  })
+  // const {
+  //   data: medicineData,
+  //   isFetching,
+  //   isFetched,
+  // } = useQuery(['medicines', debouncedQuery], searchMedicines(debouncedQuery), {
+  //   enabled: debouncedQuery.trim().length > 2,
+  //   refetchOnWindowFocus: false,
+  //   retry: false,
+  //   initialData: [],
+  // })
 
   const handleClose = () => {
     setSelectedMedicine(null)
   }
 
-  const handleSearch = (value: string) => {
-    setSearchValue(value)
-  }
+  // const handleSearch = (value: string) => {
+  //   setSearchValue(value)
+  // }
 
-  const handleSelect = (medicine: MedicineItemType) => {
-    setSelectedMedicine(medicine)
-  }
+  // const handleSelect = (medicine: MedicineItemType) => {
+  //   setSelectedMedicine(medicine)
+  // }
 
   const handleSave = async (medicine: MedicineItemType, expiryState: MedicineItemType['expiryState']) => {
     const { isExpensive, isRare } = await checkMedicineDetails(medicine)
@@ -96,7 +94,6 @@ const Names = () => {
     saveFormState(newMedicineList)
     setSelectedMedicine(null)
     setSearchValue('')
-    // setAnimate(medicine._id)
     mixpanel.track('add_medicine', { medicine: medicine.englishName, expiryState })
   }
 
@@ -169,8 +166,8 @@ const Names = () => {
         layout
         transition={{ ease: easeInOut, type: 'tween', duration: 0.35 }}
       >
-        <Autocomplete searchValue={searchValue} onValueChange={handleSearch} placeholder={t('names_search_placeholder')} />
-        <MedicineSuggestions
+        {/* <Autocomplete searchValue={searchValue} onValueChange={handleSearch} placeholder={t('names_search_placeholder')} /> */}
+        {/* <MedicineSuggestions
           searchValue={searchValue}
           onRemove={handleRemove}
           onSelect={handleSelect}
@@ -178,10 +175,10 @@ const Names = () => {
           isFetched={isFetched}
           isFetching={isFetching}
           savedMedicines={savedMedicines}
-          animate={animate}
           hideText={hideText}
           medicineData={medicineData}
-        />
+        /> */}
+        <MedicineList savedMedicines={savedMedicines} onRemove={handleRemove} onSave={handleSave} onSkip={handleSkip} hideText={hideText} />
       </motion.div>
       <SwipeableDrawer
         anchor="bottom"
@@ -201,19 +198,16 @@ const Names = () => {
             left: 'calc(50% - 20px)',
           }}
         />
-        <Box sx={{ overflow: 'scroll' }}>
-          {selectedMedicine && <AddMedicine onSave={handleSave} medicine={selectedMedicine} />}
-        </Box>
+        <Box sx={{ overflow: 'scroll' }}>{selectedMedicine && <AddMedicine onSave={handleSave} medicine={selectedMedicine} />}</Box>
       </SwipeableDrawer>
-      {loadingDone ? <Button variant="contained" disabled={true}><CircularProgress size={16}/></Button> :
-        <Button
-          variant="contained"
-          disabled={savedMedicines.length < 1}
-          sx={{ opacity: savedMedicines.length > 0 || (savedMedicines.length < 1 && hideText) ? 1 : 0 }}
-          onClick={handleDone}
-        >
-          {t('im_done')} ({savedMedicines.length})
-        </Button>}
+      <Button
+        variant="contained"
+        disabled={savedMedicines.length < 1}
+        sx={{ opacity: savedMedicines.length > 0 || (savedMedicines.length < 1 && hideText) ? 1 : 0 }}
+        onClick={handleDone}
+      >
+        {t('im_done')} ({savedMedicines.length})
+      </Button>
     </Stack>
   )
 }

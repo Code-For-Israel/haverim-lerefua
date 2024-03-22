@@ -53,13 +53,13 @@ const MapPage = () => {
         }
       } catch (e: any) {
         setError(e.message)
-        mixpanel.track('Error', { 
+        mixpanel.track('Error', {
           error: 'fetchLocations',
           on: 'fetchLocations; MapPage',
           reason: e.message || e.toString(),
           errorContext: {
-            requestUrl: url
-          }
+            requestUrl: url,
+          },
         })
 
         setLocations([])
