@@ -42,7 +42,6 @@ const AddMedicineNewDialog = ({ onSave, open, onClose }: Props) => {
       dragRegNum: '',
       barcodes: '',
     }
-    console.log('tempMedicine', tempMedicine, expiryState)
     onSave(tempMedicine, expiryState as MedicineItemType['expiryState'])
     onClose()
   }
