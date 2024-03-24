@@ -32,6 +32,9 @@ const MedicinePreviewItem = ({ medicine, onClick, onRemove, selected, hideLastBo
         py: 5,
         borderBottom: '1px solid #B3B3B3',
         width: '100%',
+        '&:first-of-type': {
+          borderTop: hideLastBorder ? 'none' : '1px solid #B3B3B3',
+        },
         '&:last-of-type': {
           borderBottom: hideLastBorder ? 'none' : '1px solid #B3B3B3',
         },

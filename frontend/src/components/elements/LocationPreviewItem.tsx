@@ -82,6 +82,7 @@ const LocationPreviewItem = ({ location, onClick, focusMap }: Props) => {
             textAlign: 'start',
             justifyContent: 'start',
             position: 'relative',
+            width: 'fit-content',
           }}
           onClick={handleClick}
           fullWidth={false}

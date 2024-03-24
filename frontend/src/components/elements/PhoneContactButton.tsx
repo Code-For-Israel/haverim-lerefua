@@ -18,7 +18,23 @@ const PhoneContactButton = ({ number, messageText }: Props) => {
   const iconSize = isMobile ? 30 : 32
 
   return (
-    <Tooltip title={number} placement="right" arrow>
+    <Tooltip
+      title={number}
+      placement="right"
+      arrow
+      slotProps={{
+        popper: {
+          modifiers: [
+            {
+              name: 'offset',
+              options: {
+                offset: [0, -8],
+              },
+            },
+          ],
+        },
+      }}
+    >
       <IconButton disableRipple href={isMobile ? generateWALink(messageText, cleanNumber) : `tel:${cleanNumber}`} target="_blank">
         <Image src={isMobile ? WhatsAppIcon : PhoneIcon} alt={number} width={iconSize} height={iconSize} />
       </IconButton>

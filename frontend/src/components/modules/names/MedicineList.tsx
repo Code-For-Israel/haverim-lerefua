@@ -28,7 +28,16 @@ const MedicineList = ({ savedMedicines, onRemove, onSkip, onSave, isFetching }: 
 
   return (
     <>
-      <Box pt={2} position={'relative'} sx={{ width: '100%', height: '100%', minHeight: 60, maxHeight: 'calc(70svh - 250px)', overflowY: 'auto' }}>
+      <Box
+        position={'relative'}
+        sx={{
+          width: '100%',
+          height: '100%',
+          minHeight: 60,
+          maxHeight: 'calc(70svh - 250px)',
+          overflowY: 'auto',
+        }}
+      >
         <LoaderOverlay loading={isFetching} />
         {openDialog && <AddMedicineNewDialog onSave={onSave} open={openDialog} onClose={closeNewMedicineDialog} />}
         {savedMedicines.map((m: MedicineItemType, i: number) => (
@@ -45,13 +54,7 @@ const MedicineList = ({ savedMedicines, onRemove, onSkip, onSave, isFetching }: 
         >
           {t('add_new_medicine')}
         </Button>
-        <Button
-          variant="text"
-          color="info"
-          sx={{ width: 'fit-content', textAlign: 'center', margin: 'auto', mt: 1 }}
-          disabled={isFetching}
-          onClick={onSkip}
-        >
+        <Button variant="text" color="info" sx={{ width: 'fit-content', textAlign: 'center', margin: 'auto' }} disabled={isFetching} onClick={onSkip}>
           {t('want_to_skip')}
         </Button>
       </Stack>
