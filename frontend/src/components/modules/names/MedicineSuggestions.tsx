@@ -15,22 +15,10 @@ type Props = {
   onSelect: (medicine: MedicineItemType) => void
   onRemove: (medicine: MedicineItemType) => void
   onSkip: () => void
-  animate: string | null
   searchValue: string
 }
 
-const MedicineSuggestions = ({
-  searchValue,
-  medicineData,
-  isFetching,
-  hideText,
-  isFetched,
-  savedMedicines,
-  onSelect,
-  onRemove,
-  onSkip,
-  animate,
-}: Props) => {
+const MedicineSuggestions = ({ searchValue, medicineData, isFetching, hideText, isFetched, savedMedicines, onSelect, onRemove, onSkip }: Props) => {
   const [openDialog, setOpenDialog] = useState(false)
   const { t } = useStaticTranslation()
   const isMedicineAdded = (id: string) => savedMedicines.some((m: MedicineItemType) => m._id === id)
@@ -64,15 +52,7 @@ const MedicineSuggestions = ({
       {hideText &&
         orderedData.length > 0 &&
         orderedData.map((m: MedicineItemType, i: number) => (
-          <MedicinePreviewItem
-            onClick={onSelect}
-            key={m._id}
-            selected={isMedicineAdded(m._id)}
-            index={i}
-            animate={animate}
-            medicine={m}
-            onRemove={onRemove}
-          />
+          <MedicinePreviewItem onClick={onSelect} key={m._id} selected={isMedicineAdded(m._id)} index={i} medicine={m} onRemove={onRemove} />
         ))}
       {isFetched && hideText && medicineData.length < 1 && (
         <Box sx={{ mt: '20px', textAlign: 'center' }}>

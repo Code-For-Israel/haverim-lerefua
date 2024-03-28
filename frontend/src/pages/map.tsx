@@ -34,9 +34,10 @@ const MapPage = () => {
 
   useEffect(() => {
     const fetchLocations = async () => {
+      const url = `https://92e9pbwbok.execute-api.il-central-1.amazonaws.com/default/items`
       try {
         // const query = filter ? `?filter=${filter}` : ''
-        const res = await axios.get(`https://92e9pbwbok.execute-api.il-central-1.amazonaws.com/default/items`)
+        const res = await axios.get(url)
         if (res.data) {
           const locs: Location[] = await JSON.parse(res.data.body)
           locs.forEach((l: any) => {
@@ -52,7 +53,14 @@ const MapPage = () => {
         }
       } catch (e: any) {
         setError(e.message)
-        mixpanel.track('Error', { error: e.message, on: 'fetchLocations; MapPage' })
+        mixpanel.track('Error', {
+          error: 'fetchLocations',
+          on: 'fetchLocations; MapPage',
+          reason: e.message || e.toString(),
+          errorContext: {
+            requestUrl: url,
+          },
+        })
 
         setLocations([])
       } finally {

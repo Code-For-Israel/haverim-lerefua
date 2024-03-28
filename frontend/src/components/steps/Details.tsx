@@ -2,11 +2,11 @@ import FormField from '@/components/elements/FormField'
 import useFormWizard from '@/hooks/useFormWizard'
 import useStaticTranslation from '@/hooks/useStaticTranslation'
 import { generateWALink } from '@/util/whatsapp'
-import { Box, Button, Link, Stack, Typography } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import { FormValuesType } from 'FormTypes'
 import { formatIncompletePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js'
 import mixpanel from 'mixpanel-browser'
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
 const Details = () => {
@@ -19,8 +19,8 @@ const Details = () => {
   const buildMessage = (data?: FormValuesType) => {
     const messageArr = [t('wa_app_intro'), `${t('hello')},`, t('wa_app_intro_2')]
     if (data) {
-      const { fullName, town, street, houseNumber } = data
-      messageArr.splice(1, 1, t('wa_personal_info', { fullName, fullAddress: `${street} ${houseNumber}, ${town}` }))
+      const { fullName, town, street, houseNumber, phoneNumber } = data
+      messageArr.splice(1, 1, t('wa_personal_info', { fullName, phoneNumber, fullAddress: `${street} ${houseNumber}, ${town}` }))
     }
     const medicineListString = medicines?.map(m => `${m.Name}${m.expiryState === 'inAMonth' ? ` - ${t('close_to_expire')}` : ''}`).join('\n')
     if (medicineListString) {
@@ -34,16 +34,21 @@ const Details = () => {
     return messageArr.join('\n')
   }
 
-  const link = useMemo(() => generateWALink(buildMessage()), [])
-
   const onSubmit = (data: FormValuesType) => {
     updateFormData(data)
-    submitData('whatsapp')
+    submitData('whatsapp_details', data)
     mixpanel.track('whatsapp_details_sent')
     const waMessage = buildMessage(data)
     const waLink = generateWALink(waMessage)
     window.open(waLink, '_blank')
     stepTo('thank-you')
+  }
+
+  const handleSubmitNoDetails = () => {
+    mixpanel.track('whatsapp_no_details')
+    submitData('whatsapp')
+    const link = generateWALink(buildMessage())
+    window.open(link, '_blank')
   }
 
   return (
@@ -106,9 +111,9 @@ const Details = () => {
         <Button type="submit" disabled={!isValid}>
           {t('connect_to_rep')}
         </Button>
-        <Link color={'inherit'} href={link} target="_blank">
+        <Button variant="text" sx={{ fontSize: 'inherit', color: 'inherit' }} onClick={handleSubmitNoDetails}>
           {t('send_on_whatsapp')}
-        </Link>
+        </Button>
       </Stack>
     </Stack>
   )

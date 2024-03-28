@@ -1,3 +1,8 @@
+export AWS_ACCESS_KEY_ID=AKIAR2ARWK24R6YQYI7X
+export AWS_SECRET_ACCESS_KEY=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
+aws s3 cp s3://haverim-app-frontend ./build --recursive           
+
+
 # Haverim Lerefua Backend
 
 ## Tech Stack

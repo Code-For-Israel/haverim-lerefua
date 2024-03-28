@@ -9,11 +9,11 @@ const NamesSummary = () => {
   const { stepTo, stepBack, formData, updateFormData, submitData } = useFormWizard()
   const { t } = useStaticTranslation()
   const router = useRouter()
-  const { hasMoreProducts, hasCold, hasExpensive, expensiveDetected, expiringDetected } = formData
+  const { hasMoreProducts, hasCold, hasExpensive, expensiveDetected, rareDetected, expiringDetected } = formData
   const selectedMedicines = formData?.medicines || []
 
   const handleFinish = () => {
-    if (hasExpensive || expensiveDetected || hasMoreProducts || expiringDetected) {
+    if (hasExpensive || expensiveDetected || rareDetected || hasMoreProducts || expiringDetected) {
       stepTo('details')
     } else {
       submitData('map')
@@ -28,6 +28,9 @@ const NamesSummary = () => {
   const handleRemove = (medicine: MedicineItemType) => {
     const newMedicines = selectedMedicines?.filter((m: MedicineItemType) => m._id !== medicine._id)
     updateFormData({ ...formData, medicines: newMedicines })
+    if (newMedicines.length === 0) {
+      stepBack()
+    }
   }
 
   return (

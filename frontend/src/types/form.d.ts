@@ -11,6 +11,7 @@ declare module 'FormTypes' {
     medicines?: MedicineItemType[]
     hasExpensive?: boolean
     expensiveDetected?: boolean
+    rareDetected?: boolean
     hasCold?: boolean
     [key: string]: any
   }

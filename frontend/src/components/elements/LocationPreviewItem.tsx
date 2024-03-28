@@ -1,12 +1,12 @@
 import AppChip from '@/components/elements/AppChip'
 import useStaticTranslation from '@/hooks/useStaticTranslation'
 import { renderLocationIcon } from '@/util/mapFunctions'
-import { generateWALink } from '@/util/whatsapp'
-import { Button, IconButton, Popover, Stack, Typography } from '@mui/material'
+import { Button, Popover, Stack, Typography } from '@mui/material'
 import type { Location } from 'LocationTypes'
 import Image from 'next/image'
-import WhatsAppIcon from 'public/icons/whatsapp.svg'
+
 import { MouseEvent, memo, useState } from 'react'
+import PhoneContactButton from './PhoneContactButton'
 
 type Props = { location: Location; onClick: (location: Location) => void; focusMap: (location: google.maps.LatLngLiteral) => void }
 
@@ -82,13 +82,21 @@ const LocationPreviewItem = ({ location, onClick, focusMap }: Props) => {
             textAlign: 'start',
             justifyContent: 'start',
             position: 'relative',
+            width: 'fit-content',
           }}
           onClick={handleClick}
           fullWidth={false}
         >
-          <Typography sx={{ width: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{`${t('street_short')} ${
-            location.FormattedAddress
-          }`}</Typography>
+          <Typography
+            sx={{
+              width: '100%',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {`${t('street_short')} ${location.FormattedAddress}`}
+          </Typography>
         </Button>
         {location.OpeningHours_c && (
           <>
@@ -136,11 +144,7 @@ const LocationPreviewItem = ({ location, onClick, focusMap }: Props) => {
           </>
         )}
       </Stack>
-      {location.WhatsappNumber_c && (
-        <IconButton disableRipple href={generateWALink(t('wa_default_text'), location.WhatsappNumber_c)} target="_blank">
-          <Image src={WhatsAppIcon} alt="whatsapp" width={30} height={30} />
-        </IconButton>
-      )}
+      <PhoneContactButton number={location.WhatsappNumber_c} messageText={t('wa_default_text')} />
     </Stack>
   )
 }
