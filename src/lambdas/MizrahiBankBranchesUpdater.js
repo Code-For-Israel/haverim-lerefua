@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { BatchWriteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
+import { BatchWriteCommand, DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb'
 
 const MIZRAHI_BRANCHES_ENDPOINT = 'https://www.mizrahi-tefahot.co.il/umbraco/surface/searchBranches/GetCurrentLocationBranches?siteLang=he-IL'
 
@@ -34,6 +34,39 @@ export const handler = async (event, context) => {
       }
     })
 
+    console.log('deleting old records')
+    const scanCommand = new ScanCommand({
+      TableName: TABLE_NAME,
+      FilterExpression: '#Type_c = :t',
+      ExpressionAttributeValues: { ':t': 'mizrahi_bank' },
+      ExpressionAttributeNames: { '#Type_c': 'Type_c' },
+    })
+    try {
+      const data = await docClient.send(scanCommand)
+      const deleteRequests = data.Items.map(e => {
+        return {
+          DeleteRequest: {
+            Key: {
+              _id: e['_id'],
+              Type_c: 'mizrahi_bank'
+            },
+          },
+        }
+      })
+      while (deleteRequests.length > 0) {
+        const deleteCommand = new BatchWriteCommand({
+          RequestItems: {
+            [TABLE_NAME]: deleteRequests.splice(0, 25),
+          },
+        })
+        await docClient.send(deleteCommand)
+        console.log(`${deleteRequests.length} items remaining..`)
+        await new Promise(resolve => setTimeout(resolve, 3000))
+      }
+    } catch (err) {
+      return err
+    }
+
     console.log('start writing results to db')
     while (putRequests.length > 0) {
       const command = new BatchWriteCommand({
@@ -43,6 +76,7 @@ export const handler = async (event, context) => {
       })
       await docClient.send(command)
       console.log(`${putRequests.length} items remaining..`)
+      await new Promise(resolve => setTimeout(resolve, 3000))
     }
   } catch (err) {
     statusCode = 400
@@ -86,7 +120,7 @@ class MizrahiBankScraper {
       OrganizationName_c: 'MizrahiBank',
       Settelment_c: storeObj.ShemYeshuv,
       Address_c: storeObj.Ktovet,
-      Type_c: 'public',
+      Type_c: 'mizrahi_bank',
       OpeningHours_c: MizrahiBankScraper.formatOpeningHours(storeObj.OpeningHours),
       RefrigeratedMedicines_c: false,
       Status_c: 'active',
@@ -96,7 +130,7 @@ class MizrahiBankScraper {
   }
 
   static formatOpeningHours(hoursObject) {
-    function fotmateSheotPticha(obj) {
+    function formatSheotPticha(obj) {
       return obj
         .replace(re, '')
         .match(/.{1,11}/g)
@@ -105,7 +139,7 @@ class MizrahiBankScraper {
     const re = / |‏/gi
     return hoursObject
       .filter(e => e.YemeiPticha.length > 0 && e.SheotPticha.length > 1)
-      .map(e => `${e.YemeiPticha.replace(re, '')}: ${fotmateSheotPticha(e.SheotPticha)}\r\n`)
+      .map(e => `${e.YemeiPticha.replace(re, '')}: ${formatSheotPticha(e.SheotPticha)}\r\n`)
       .reduce((acc, cur) => acc + cur, '')
   }
 }

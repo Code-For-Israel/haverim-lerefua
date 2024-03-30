@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { BatchWriteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
+import { BatchWriteCommand, DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb'
 
 const SUPER_PHARM_BRANCHES_ENDPOINT =
   'https://shop.super-pharm.co.il/branches/filter?q=&page=0&buildFacets=true&selectedCity=&clinic=&service=&brand=&branch=&ignoreDistanceLimit=true'
@@ -35,6 +35,39 @@ export const handler = async (event, context) => {
       }
     })
 
+    console.log('deleting old records')
+    const scanCommand = new ScanCommand({
+      TableName: TABLE_NAME,
+      FilterExpression: '#Type_c = :t',
+      ExpressionAttributeValues: { ':t': 'super_pharm' },
+      ExpressionAttributeNames: { '#Type_c': 'Type_c' },
+    })
+    try {
+      const data = await docClient.send(scanCommand)
+      const deleteRequests = data.Items.map(e => {
+        return {
+          DeleteRequest: {
+            Key: {
+              _id: e['_id'],
+              Type_c: 'super_pharm',
+            },
+          },
+        }
+      })
+      while (deleteRequests.length > 0) {
+        const deleteCommand = new BatchWriteCommand({
+          RequestItems: {
+            [TABLE_NAME]: deleteRequests.splice(0, 25),
+          },
+        })
+        await docClient.send(deleteCommand)
+        console.log(`${deleteRequests.length} items remaining..`)
+        await new Promise(resolve => setTimeout(resolve, 3000))
+      }
+    } catch (err) {
+      return err
+    }
+
     console.log('start writing results to db')
     while (putRequests.length > 0) {
       const command = new BatchWriteCommand({
@@ -44,6 +77,7 @@ export const handler = async (event, context) => {
       })
       await docClient.send(command)
       console.log(`${putRequests.length} items remaining..`)
+      await new Promise(resolve => setTimeout(resolve, 3000))
     }
   } catch (err) {
     statusCode = 400
@@ -85,7 +119,7 @@ class SuperPharmScraper {
       OrganizationName_c: 'SuperPharm',
       Settelment_c: storeObj.branchCity,
       Address_c: storeObj.branchAddress,
-      Type_c: 'public',
+      Type_c: 'super_pharm',
       OpeningHours_c: storeObj.branchOpeningTime,
       RefrigeratedMedicines_c: false,
       Status_c: 'active',

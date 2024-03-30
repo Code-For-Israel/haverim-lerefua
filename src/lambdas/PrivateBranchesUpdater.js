@@ -1,5 +1,44 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb'
-import { BatchWriteCommand, DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb'
+import { BatchWriteCommand, DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb'
+
+const BOARD_ID = '1362091596'
+const PAGE_SIZE = 200
+const MONDAY_API_KEY =
+  'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjMwNTk5NzA4OSwiYWFpIjoxMSwidWlkIjo1MzY2NTE2OSwiaWFkIjoiMjAyNC0wMS0wMlQxMzowNDo1OS4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTk2ODU3OTYsInJnbiI6ImV1YzEifQ._VSs6LU-B7jTS3xPMb1otBLJV-fk-XFB4iBBYQSiDRU'
+
+const INITIAL_QUERY =
+  'query ($boardId: ID!, $pageSize: Int!) \n' +
+  '{\n' +
+  '  items_page_by_column_values (limit: $pageSize, board_id: $boardId, columns: [{column_id: "check", column_values: ["true"]}\n' +
+  '  ]) {\n' +
+  '    cursor\n' +
+  '    items {\n' +
+  '      id\n' +
+  '      name\n' +
+  '      column_values {\n' +
+  '        id\n' +
+  '        value\n' +
+  '        text\n' +
+  '      }\n' +
+  '    }\n' +
+  '  }\n' +
+  '}'
+
+const CURSOR_QUERY =
+  'query ($pageSize: Int!, $cursor: String!) {\n' +
+  '    next_items_page (limit: $pageSize, cursor: $cursor) {\n' +
+  '    cursor\n' +
+  '    items {\n' +
+  '      id\n' +
+  '      name\n' +
+  '      column_values {\n' +
+  '        id\n' +
+  '        value\n' +
+  '        text\n' +
+  '      }\n' +
+  '    }\n' +
+  '  }\n' +
+  '}'
 
 export const handler = async (event, context) => {
   const client = new DynamoDBClient({ region: 'il-central-1' })
@@ -20,35 +59,49 @@ export const handler = async (event, context) => {
     if (!docClient) {
       throw Error('failed to initiate DynamoDB client')
     }
-    const branches = event.data.branches
-    const putRequests = branches
-      .map(b => {
+    console.log('start fetching branches from endpoint')
+    const branches = await MondayBoardScraper.getBranchesFromEndpoint()
+    console.log(`finished fetching branches from endpoint, found ${branches.length} entries.`)
+    const putRequests = branches.map(b => {
+      return {
+        PutRequest: {
+          Item: b,
+        },
+      }
+    })
+
+    console.log('deleting old records')
+    const scanCommand = new ScanCommand({
+      TableName: TABLE_NAME,
+      FilterExpression: '#Type_c = :t',
+      ExpressionAttributeValues: { ':t': 'monday_board' },
+      ExpressionAttributeNames: { '#Type_c': 'Type_c' },
+    })
+    try {
+      const data = await docClient.send(scanCommand)
+      const deleteRequests = data.Items.map(e => {
         return {
-          _id: b._id.toString(),
-          Name_c: b.Name_c,
-          ContactName_c: b.ContactName_c,
-          FirstName_c: b.FirstName_c,
-          LastName_c: b.LastName_c,
-          WhatsappNumber_c: b.WhatsappNumber_c,
-          OrganizationName_c: '',
-          Settelment_c: b.Settelment_c,
-          Address_c: b.Address_c,
-          FormattedAddress: b.FormattedAddress,
-          Type_c: 'private',
-          OpeningHours_c: b.OpeningHours_c,
-          RefrigeratedMedicines_c: b.RefrigeratedMedicines_c,
-          Status_c: 'active',
-          CoordinateLat_c: b.Coordinates_c?.lat || 0,
-          CoordinateLng_c: b.Coordinates_c?.lng || 0,
-        }
-      })
-      .map(b => {
-        return {
-          PutRequest: {
-            Item: b,
+          DeleteRequest: {
+            Key: {
+              _id: e['_id'],
+              Type_c: 'monday_board',
+            },
           },
         }
       })
+      while (deleteRequests.length > 0) {
+        const deleteCommand = new BatchWriteCommand({
+          RequestItems: {
+            [TABLE_NAME]: deleteRequests.splice(0, 25),
+          },
+        })
+        await docClient.send(deleteCommand)
+        console.log(`${deleteRequests.length} items remaining..`)
+        await new Promise(resolve => setTimeout(resolve, 3000))
+      }
+    } catch (err) {
+      return err
+    }
 
     console.log('start writing results to db')
     while (putRequests.length > 0) {
@@ -59,6 +112,7 @@ export const handler = async (event, context) => {
       })
       await docClient.send(command)
       console.log(`${putRequests.length} items remaining..`)
+      await new Promise(resolve => setTimeout(resolve, 4000))
     }
   } catch (err) {
     statusCode = 400
@@ -72,4 +126,76 @@ export const handler = async (event, context) => {
     body,
     headers,
   }
+}
+
+class MondayBoardScraper {
+  static async getBranchesFromEndpoint() {
+    const boardItems = []
+    try {
+      let res = await fetchFromMondayApi(INITIAL_QUERY, {
+        boardId: BOARD_ID,
+        pageSize: PAGE_SIZE,
+      })
+      boardItems.push(...res.data.items_page_by_column_values.items)
+      let cursor = res.data.items_page_by_column_values.cursor
+      while (cursor) {
+        res = await fetchFromMondayApi(CURSOR_QUERY, {
+          pageSize: PAGE_SIZE,
+          cursor,
+        })
+        boardItems.push(...res.data.next_items_page.items)
+        cursor = res.data.next_items_page.cursor
+      }
+    } catch (err) {
+      if (err.response) {
+        // The client was given an error response (5xx, 4xx)
+      } else if (err.request) {
+        // The client never received a response, and the request was never left
+        console.log(err.request)
+      } else {
+        // Anything else
+      }
+    }
+    return boardItems.map(this.extractBranchDetails)
+  }
+
+  static extractBranchDetails(element) {
+    const obj = {}
+    element.column_values.forEach(e => {
+      obj[e.id] = e.text
+    })
+    return {
+      _id: element.id.toString(),
+      Name_c: element.name,
+      // ContactName_c: b.ContactName_c,
+      // FirstName_c: b.FirstName_c,
+      // LastName_c: b.LastName_c,
+      WhatsappNumber_c: obj.text9,
+      OrganizationName_c: '',
+      Settelment_c: obj.text4,
+      Address_c: `${obj.text8}, ${obj.text4}`,
+      FormattedAddress: `${obj.text8}, ${obj.text4}`,
+      Type_c: 'monday_board',
+      OpeningHours_c: obj.text46,
+      RefrigeratedMedicines_c: obj.color4 === 'כן' ? true : false,
+      Status_c: 'active',
+      CoordinateLat_c: obj.text32 || 0,
+      CoordinateLng_c: obj.text356 || 0,
+    }
+  }
+}
+
+async function fetchFromMondayApi(query, variables) {
+  return fetch('https://api.monday.com/v2', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: MONDAY_API_KEY,
+      'API-version': '2023-10',
+    },
+    body: JSON.stringify({
+      query,
+      variables,
+    }),
+  }).then(res => res.json())
 }
