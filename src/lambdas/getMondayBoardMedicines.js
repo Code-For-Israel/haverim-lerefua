@@ -7,7 +7,12 @@ const QUERY = `query ($boardId: [ID!]){
     items_page {
       items {
         id 
-        name 
+        name,
+        column_values(ids: ["text", "dropdown"]){
+          id
+          text,
+          value
+        }
       }
     }
   }

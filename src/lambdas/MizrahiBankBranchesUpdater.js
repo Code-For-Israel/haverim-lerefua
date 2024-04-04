@@ -48,7 +48,7 @@ export const handler = async (event, context) => {
           DeleteRequest: {
             Key: {
               _id: e['_id'],
-              Type_c: 'mizrahi_bank'
+              Type_c: 'mizrahi_bank',
             },
           },
         }
@@ -131,10 +131,24 @@ class MizrahiBankScraper {
 
   static formatOpeningHours(hoursObject) {
     function formatSheotPticha(obj) {
-      return obj
-        .replace(re, '')
-        .match(/.{1,11}/g)
-        .toString()
+      function clearString(obj) {
+        return obj
+          .replace(re, '')
+          .match(/.{1,11}/g)
+          .toString()
+      }
+      function swapTimeFormat(inputString) {
+        // Regular expression to match hour objects in the format MM:HH
+        const regex = /(\d{2}):(\d{2})/g
+        // Use replace with a callback function to swap the time format
+        const result = inputString.replace(regex, function (match, p1, p2) {
+          // p1 represents the first capturing group (\d{2}) which corresponds to MM
+          // p2 represents the second capturing group (\d{2}) which corresponds to HH
+          return p2 + ':' + p1 // Swap the positions
+        })
+        return result
+      }
+      return swapTimeFormat(clearString(obj))
     }
     const re = / |‏/gi
     return hoursObject
