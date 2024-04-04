@@ -10,16 +10,32 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import MedicineList from '../modules/names/MedicineList'
 
+type MondayResponseType = {
+  id: string
+  name: string
+  column_values: { id: string; text: string }[]
+}
+
 const getRareMedicines = async () => {
   const res = await axios.get('https://493owoz84m.execute-api.il-central-1.amazonaws.com/default/getMedicineList')
-  return res.data.map((m: { id: string; name: string }) => m.name)
+  const namesArray: string[] = []
+  for (const item of res.data as MondayResponseType[]) {
+    namesArray.push(item.name)
+    if (item.column_values[0].text.length > 0) {
+      namesArray.push(item.column_values[0].text)
+    }
+  }
+  return namesArray
 }
 
 const Names = () => {
   const { stepTo, formData, updateFormData, submitData } = useFormWizard()
   const { medicineQuantity, hasExpensive, hasCold, expensiveDetected, hasMoreProducts } = formData
   const isManyMedicines = medicineQuantity && medicineQuantity !== '1-10'
-  const { data: rareMedicines, isFetching } = useQuery(['rareMedicines'], getRareMedicines, { refetchOnWindowFocus: false })
+  const { data: rareMedicines, isFetching } = useQuery<string[]>(['rareMedicines'], getRareMedicines, {
+    refetchOnWindowFocus: false,
+    initialData: [],
+  })
 
   const { t } = useStaticTranslation()
   const router = useRouter()
