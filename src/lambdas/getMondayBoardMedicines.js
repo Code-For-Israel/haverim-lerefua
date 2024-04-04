@@ -7,7 +7,12 @@ const QUERY = `query ($boardId: [ID!]){
     items_page {
       items {
         id 
-        name 
+        name,
+        column_values{
+          id
+          text,
+          value
+        }
       }
     }
   }
@@ -51,3 +56,7 @@ export const handler = async (event, context) => {
     headers,
   }
 }
+
+console.log(JSON.stringify(await fetchFromMondayApi(QUERY, {
+    boardId: BOARD_ID,
+  })))
