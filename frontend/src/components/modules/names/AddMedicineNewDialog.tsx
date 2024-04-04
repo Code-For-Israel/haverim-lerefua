@@ -1,10 +1,8 @@
 import BaseDialog from '@/components/elements/BaseDialog'
 import FormRadio from '@/components/elements/FormRadio'
 import useStaticTranslation from '@/hooks/useStaticTranslation'
-import { Button, FormControl, FormLabel, RadioGroup, Stack, TextField, Typography } from '@mui/material'
+import { Autocomplete, Button, FormControl, FormLabel, RadioGroup, Stack, TextField, Typography } from '@mui/material'
 import { MedicineItemType } from 'MedicineTypes'
-import Image from 'next/image'
-import EditIcon from 'public/icons/edit.svg'
 import { Controller, useForm } from 'react-hook-form'
 
 type FormValues = {
@@ -16,16 +14,19 @@ type Props = {
   open: boolean
   onClose: () => void
   onSave: (medicine: MedicineItemType, state: MedicineItemType['expiryState']) => void
+  rareMedicines: string[]
 }
 
-const AddMedicineNewDialog = ({ onSave, open, onClose }: Props) => {
+const AddMedicineNewDialog = ({ onSave, open, onClose, rareMedicines }: Props) => {
   const { t } = useStaticTranslation()
   const {
     handleSubmit,
     register,
     control,
+    watch,
     formState: { errors },
   } = useForm<FormValues>()
+  const { medicineName } = watch()
 
   const createID = (str: string) => {
     const date = new Date()
@@ -52,13 +53,20 @@ const AddMedicineNewDialog = ({ onSave, open, onClose }: Props) => {
         <Typography variant="h2" textAlign={'center'} color={'inherit'}>
           {t('add_medicine_for_donation')}
         </Typography>
-        <TextField
-          variant="standard"
-          label={t('medicine_name')}
-          {...register('medicineName', { required: t('required_field'), minLength: { value: 3, message: t('required_field') } })}
-          InputProps={{ endAdornment: <Image src={EditIcon} alt="edit" /> }}
-          error={!!errors.medicineName}
-          helperText={`${errors.medicineName?.message || ''}`}
+        <Autocomplete
+          freeSolo
+          options={medicineName && medicineName.length > 2 && !!rareMedicines ? rareMedicines : []}
+          disableClearable
+          renderInput={params => (
+            <TextField
+              variant="standard"
+              label={t('medicine_name')}
+              {...register('medicineName', { required: t('required_field'), minLength: { value: 3, message: t('required_field') } })}
+              error={!!errors.medicineName}
+              helperText={`${errors.medicineName?.message || ''}`}
+              {...params}
+            />
+          )}
           autoFocus
         />
         <Controller
