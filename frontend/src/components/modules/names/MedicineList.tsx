@@ -12,10 +12,11 @@ type Props = {
   onSkip: () => void
   onSave: (medicine: MedicineItemType, state: MedicineItemType['expiryState']) => void
   isFetching: boolean
+  rareMedicines: string[]
 }
 
-const MedicineList = ({ savedMedicines, onRemove, onSkip, onSave, isFetching }: Props) => {
-  const [openDialog, setOpenDialog] = useState(savedMedicines.length > 0 ? false : true)
+const MedicineList = ({ savedMedicines, rareMedicines, onRemove, onSkip, onSave, isFetching }: Props) => {
+  const [openDialog, setOpenDialog] = useState(savedMedicines.length > 0 && !isFetching ? false : true)
   const { t } = useStaticTranslation()
   const isMedicineAdded = (id: string) => savedMedicines.some((m: MedicineItemType) => m._id === id)
 
@@ -39,7 +40,7 @@ const MedicineList = ({ savedMedicines, onRemove, onSkip, onSave, isFetching }: 
         }}
       >
         <LoaderOverlay loading={isFetching} />
-        {openDialog && <AddMedicineNewDialog onSave={onSave} open={openDialog} onClose={closeNewMedicineDialog} />}
+        {openDialog && <AddMedicineNewDialog rareMedicines={rareMedicines} onSave={onSave} open={openDialog} onClose={closeNewMedicineDialog} />}
         {savedMedicines.map((m: MedicineItemType, i: number) => (
           <MedicinePreviewItem key={m._id} selected={isMedicineAdded(m._id)} index={i} medicine={m} onRemove={onRemove} />
         ))}
