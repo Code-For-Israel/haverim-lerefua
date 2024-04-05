@@ -3,6 +3,11 @@ name: Release Frontend
 on:
   workflow_dispatch
 
+# Permission can be added at job level or workflow level    
+permissions:
+      id-token: write   # This is required for requesting the JWT
+      contents: read    # This is required for actions/checkout
+
 jobs:
   release:
     name: Release
@@ -17,7 +22,6 @@ jobs:
           role-to-assume: arn:aws:iam::124591167161:role/github #change to reflect your IAM role’s ARN
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: eu-north-1
-
       
       - name: Setup node v18.x
         uses: actions/setup-node@v3
