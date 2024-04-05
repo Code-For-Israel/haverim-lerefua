@@ -22,7 +22,6 @@ jobs:
         with:
           aws-region: eu-north-1
           role-to-assume: arn:aws:iam::124591167161:role/github
-          role-session-name: GitHub_to_AWS_via_FederatedOIDC
           role-duration-seconds: 3600  # Optional: Duration in seconds for the assumed role
 
       - name: Install Dependencies
