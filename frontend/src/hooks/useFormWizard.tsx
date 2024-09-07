@@ -4,10 +4,12 @@ import axios from 'axios'
 import mixpanel from 'mixpanel-browser'
 import { useRouter } from 'next/router'
 import { useContext } from 'react'
+import CFIMetrics from '../util/cfi-metrics'
 
 const useFormWizard = () => {
   const { activeStep, setActiveStep, steps, formValues, setFormValues, stepHistory, setStepHistory, loading, setLoading } = useContext(FormContext)
   const router = useRouter()
+  const cfiMetrics = new CFIMetrics()
 
   const getStepDetails = (index: number) => {
     return steps[index]
@@ -57,6 +59,12 @@ const useFormWizard = () => {
       data: moreData ? { ...formValues, ...moreData } : formValues,
     }
     setLoading(true)
+    cfiMetrics.audit(
+      {
+        "final_stage": request.endStage == "map" ? "מפה" : "איסוף",
+        "date": new Date()
+      }
+    )
     const url = 'https://hook.eu2.make.com/9oka94wxptdx1rnxagjs1fqo7wwup4c4';
     await axios.post(
       url,
